@@ -50,17 +50,23 @@
 	</xs:element>
 	<xs:element name="Protocol">
 		<xs:complexType>
-			<xs:sequence>
+			<xs:all>
 				<xs:element name="Request">
 					<xs:complexType>
 						<xs:choice>
 							<xs:element ref="Null"/>
-							<xs:element ref="ItemArray"/>
-							<xs:element ref="ItemList"/>
-							<xs:element ref="ItemComplexField"/>
-							<xs:element ref="ItemSingleField"/>
+							<xs:choice>
+								<xs:element ref="DataGroup"/>
+							</xs:choice>
 						</xs:choice>
-						<xs:attribute name="type" use="required"/>
+						<xs:attribute name="type" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="C2G"/>
+									<xs:enumeration value="C2MSG"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Response">
@@ -75,29 +81,34 @@
 							</xs:element>
 							<xs:choice>
 								<xs:element ref="Null"/>
-								<xs:element ref="ItemArray"/>
-								<xs:element ref="ItemList"/>
-								<xs:element ref="ItemComplexField"/>
-								<xs:element ref="ItemSingleField"/>
+								<xs:element ref="DataGroup"/>
 							</xs:choice>
 						</xs:sequence>
-						<xs:attribute name="type" use="required"/>
+						<xs:attribute name="type" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="G2C"/>
+									<xs:enumeration value="MSG2C"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
-			</xs:sequence>
+			</xs:all>
 			<xs:attribute name="id" type="xs:long" use="required"/>
 			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attribute name="description" use="required"/>
 		</xs:complexType>
 	</xs:element>
-	<xs:complexType name="DataGroup">
-		<xs:choice>
-			<xs:element name="Null"/>
-			<xs:element ref="ItemArray"/>
-			<xs:element ref="ItemList"/>
-			<xs:element ref="ItemComplexField"/>
-			<xs:element ref="ItemSingleField"/>
-		</xs:choice>
-	</xs:complexType>
+	<xs:element name="DataGroup">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="ItemArray"/>
+				<xs:element ref="ItemComplexField"/>
+				<xs:element ref="ItemList"/>
+				<xs:element ref="ItemSingleField"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="Null"/>
 </xs:schema>
