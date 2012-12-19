@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 (http://www.altova.com) by hill (hill) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="ItemList">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="ItemComplexField"/>
+			</xs:choice>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="description" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ItemArray">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="ItemSingleField"/>
+			</xs:choice>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="description" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ItemComplexField">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="ItemArray"/>
+				<xs:element ref="ItemComplexField"/>
+				<xs:element ref="ItemList"/>
+				<xs:element ref="ItemSingleField"/>
+			</xs:choice>
+			<xs:attribute name="name" use="required"/>
+			<xs:attribute name="description" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ItemSingleField">
+		<xs:complexType>
+			<xs:attribute name="name"/>
+			<xs:attribute name="type"/>
+			<xs:attribute name="description"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Protocols">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="Protocol"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Protocol">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Request">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element ref="Null"/>
+							<xs:element ref="ItemArray"/>
+							<xs:element ref="ItemList"/>
+							<xs:element ref="ItemComplexField"/>
+							<xs:element ref="ItemSingleField"/>
+						</xs:choice>
+						<xs:attribute name="type" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Response">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Result">
+								<xs:complexType>
+									<xs:attribute name="code"/>
+									<xs:attribute name="reason"/>
+									<xs:attribute name="msg"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:choice>
+								<xs:element ref="Null"/>
+								<xs:element ref="ItemArray"/>
+								<xs:element ref="ItemList"/>
+								<xs:element ref="ItemComplexField"/>
+								<xs:element ref="ItemSingleField"/>
+							</xs:choice>
+						</xs:sequence>
+						<xs:attribute name="type" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:long" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="description" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="DataGroup">
+		<xs:choice>
+			<xs:element name="Null"/>
+			<xs:element ref="ItemArray"/>
+			<xs:element ref="ItemList"/>
+			<xs:element ref="ItemComplexField"/>
+			<xs:element ref="ItemSingleField"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="Null"/>
+</xs:schema>
