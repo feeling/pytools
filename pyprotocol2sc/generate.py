@@ -64,6 +64,8 @@ def generatePythonProtocol(protocols, filename):
     f = open(data_as_dir + '/'+filename+'_protocol.py', 'w')
     f.write('')
     f.close()
+
+
     
 def __generate_data_list(data_list, stream):
     for data in data_list:

@@ -112,7 +112,7 @@ def processRow(rowIndex, row, rowDict):
     for clomn, cell in enumerate(row):
             value = cell.internal_value
             if cell.data_type == 'n':
-                value = long(value)
+                value = long(value) if value else value
             if(rowIndex == 1):
                 if not value:
                     print '第一行存在空值'
