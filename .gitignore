@@ -1,0 +1,9 @@
+*.pid
+*.pyc
+*.log
+log/
+logs
+.settings
+dist
+build
+out

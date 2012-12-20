@@ -21,7 +21,7 @@
 	</xs:element>
 	<xs:element name="ItemComplexField">
 		<xs:complexType>
-			<xs:choice>
+			<xs:choice maxOccurs="unbounded">
 				<xs:element ref="ItemArray"/>
 				<xs:element ref="ItemComplexField"/>
 				<xs:element ref="ItemList"/>
@@ -102,7 +102,7 @@
 	</xs:element>
 	<xs:element name="DataGroup">
 		<xs:complexType>
-			<xs:choice>
+			<xs:choice maxOccurs="unbounded">
 				<xs:element ref="ItemArray"/>
 				<xs:element ref="ItemComplexField"/>
 				<xs:element ref="ItemList"/>

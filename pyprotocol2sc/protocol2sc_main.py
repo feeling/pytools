@@ -11,6 +11,9 @@ from  xml.dom import  minidom
 from pyprotocol2sc.protocol import Protocol, ProtocolRequest, ProtocolResponse,\
     ProtocolDataNull, ProtocolDataItemArray, ProtocolDataItemSingelField,\
     ProtocolDataItemList, ProtocolDataItemComplexField, ProtocolDataResult
+from pyprotocol2sc.config import protocol_dir, protocol_filename
+import os,fnmatch
+from pyprotocol2sc.generate import generateCode
 
 def parseProtocol(protocol_node, protocol):
     protocol.id = protocol_node.attributes['id'].value
@@ -76,7 +79,7 @@ def parseDataTtemArray(itemArrayNode):
     item_array.description = itemArrayNode.attributes['description'].value
     for node in children:
         if node.nodeName == 'ItemSingleField':
-            item_array.append(parseDataItemSingleField(node, item_array.item_list))
+            item_array.item_list.append(parseDataItemSingleField(node))
     return item_array
 
 def parseDataItemSingleField(itemSingleFieldNode):
@@ -117,17 +120,29 @@ def parseDataItemList(itemListNode):
             item_list.item_list.append(parseDataItemComplexField(node))
     return item_list
 
-def parse_xml(xml_file):
+def parse_xml(xml_file, currentFileName):
     doc = minidom.parse(xml_file) 
     root = doc.documentElement
     protocol_nodes = get_nodes_by_name(root,'Protocol')
+    protocols = []
     for protocol_node in protocol_nodes:
         protocol = Protocol()
+        protocols.append(protocol)
         parseProtocol(protocol_node, protocol)
-        print protocol
+    generateCode(protocols, currentFileName);
 
 def main():
-    parse_xml('../data/protocol/protocol.xml')
+    patterns = ['*.xml']
+    for root, dirs, files in os.walk(protocol_dir, True):
+        for name in files:
+            for pattern in patterns:
+                if fnmatch.fnmatch(name,pattern):
+                    print name
+                    currentFileName= os.path.splitext(name)[0]
+                    excelFile = os.path.join(root,name)
+                    if protocol_filename == '*' or (protocol_filename != '*' and protocol_filename == name):
+                        parse_xml(excelFile, currentFileName)
+                        break
 
         
 if __name__ == '__main__':

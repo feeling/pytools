@@ -1,18 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="../../doc/protocol/Protocol.xsd">
+	xsi:noNamespaceSchemaLocation="./schema/Protocol.xsd">
 	
 	<Protocol id="131001" name="demo" description="一个例子">
 		<Request type="C2G">
-			<DataGroup>
-				<ItemComplexField name="monster_info" description="怪物信息">
-					<ItemSingleField name="monster_pos" type="B" description=""/>
-				</ItemComplexField>
-			</DataGroup>
+			<Null />
 		</Request>
 		<Response type="G2C">
 			<Result code="" reason="" msg=""/>
-			<Null />
+			<DataGroup>
+				<ItemComplexField name="character_short" description="角色基本信息">
+					<ItemSingleField name="char_id" type="I" description="char id"/>
+					<ItemSingleField name="name" type="32s" description="char name"/>
+					<ItemSingleField name="sex" type="H" description="char sex"/>
+					<ItemSingleField name="career" type="H" description="char chareer"/>
+					<ItemSingleField name="level" type="I" description="char level"/>
+				</ItemComplexField>
+				
+				<ItemList name="fellow_list" description="fellows">
+					<ItemComplexField name="fellow_info" description="fellow infor">
+						<ItemSingleField name="cid" type="H" description="fellow id"/>
+						<ItemSingleField name="level" type="I" description="fellow level"/>
+						<ItemSingleField name="exp" type="I" description="fellow exp"/>
+						<ItemComplexField name="enhances" description="fellow enhances">
+							<ItemSingleField name="force" type="B" description="force enhances"/>
+							<ItemSingleField name="skill" type="B" description="skill enhances"/>
+							<ItemSingleField name="magic" type="B" description="magic enhances"/>
+						</ItemComplexField>
+						<ItemComplexField name="three_talent" description="three types talent">
+							<ItemComplexField name="force" description="force talent">
+								<ItemSingleField name="1" type="B" description=""/>
+								<ItemSingleField name="2" type="B" description=""/>
+								<ItemSingleField name="3" type="B" description=""/>
+								<ItemSingleField name="4" type="B" description=""/>
+								<ItemSingleField name="5" type="B" description=""/>
+								<ItemSingleField name="6" type="B" description=""/>
+							</ItemComplexField>
+							<ItemComplexField name="skill" description="skill talent">
+								<ItemSingleField name="1" type="B" description=""/>
+								<ItemSingleField name="2" type="B" description=""/>
+								<ItemSingleField name="3" type="B" description=""/>
+								<ItemSingleField name="4" type="B" description=""/>
+								<ItemSingleField name="5" type="B" description=""/>
+								<ItemSingleField name="6" type="B" description=""/>
+							</ItemComplexField>
+							<ItemComplexField name="magic" description="magic talent">
+								<ItemSingleField name="1" type="B" description=""/>
+								<ItemSingleField name="2" type="B" description=""/>
+								<ItemSingleField name="3" type="B" description=""/>
+								<ItemSingleField name="4" type="B" description=""/>
+								<ItemSingleField name="5" type="B" description=""/>
+								<ItemSingleField name="6" type="B" description=""/>
+							</ItemComplexField>
+						</ItemComplexField>
+						
+						<ItemList name="bag_list" description="bag list">
+							<ItemComplexField name="bag_info" description="bag info">
+								<ItemSingleField name="cid" type="H" description="cid"/>
+								<ItemSingleField name="max" type="H" description="max"/>
+								<ItemList name="item_list" description="item list">
+									<ItemComplexField name="item" description="item info">
+										<ItemSingleField name="pos" type="H" description="pos"/>
+										<ItemSingleField name="id" type="H" description="id"/>
+										<ItemSingleField name="num" type="B" description="num"/>
+										<ItemSingleField name="level" type="I" description="level"/>
+										<ItemSingleField name="current_value" type="I" description="current"/>
+									</ItemComplexField>
+								</ItemList>
+							</ItemComplexField>
+						</ItemList>
+					</ItemComplexField>
+				</ItemList>
+				
+				<ItemComplexField name="formation_get" description="formation get">
+					<ItemSingleField name="cid" type="B" description="cid"/>
+					<ItemSingleField name="level" type="B" description="level"/>
+					<ItemComplexField name="formation_info" description="current formation">
+						<ItemSingleField name="1" type="H" description="1"/>
+						<ItemSingleField name="2" type="H" description="2"/>
+						<ItemSingleField name="3" type="H" description="3"/>
+						<ItemSingleField name="4" type="H" description="4"/>
+						<ItemSingleField name="5" type="H" description="5"/>
+					</ItemComplexField>
+				</ItemComplexField>
+				
+				<ItemArray name="talent_get" description="talent">
+					<ItemSingleField name="pos" type="B" description="pos"/>
+				</ItemArray>
+				
+				<ItemComplexField name="character_pos" description="character pos">
+					<ItemSingleField name="stage_id" type="H" description="stage"/>
+					<ItemSingleField name="pos_x" type="i" description="x"/>
+					<ItemSingleField name="pos_y" type="i" description="y"/>
+				</ItemComplexField>
+				
+				<ItemComplexField name="character_use" description="character use">
+					<ItemSingleField name="money" type="I" description="money"/>
+					<ItemSingleField name="true_money" type="I" description="true money"/>
+					<ItemSingleField name="credit" type="I" description="credit"/>
+					<ItemSingleField name="fight_exp" type="I" description="fight exp"/>
+					<ItemSingleField name="stamina" type="H" description="stamina"/>
+				</ItemComplexField>
+			</DataGroup>
 		</Response>
 	</Protocol>
 </Protocols>

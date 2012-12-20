@@ -6,43 +6,55 @@ Created on 2012-12-19
 
 @author: hill
 '''
+from lib.ordereddict import OrderedDict
 class Protocol():
-    request = None
-    response = None
+    def __init__(self):
+        self.request = None
+        self.response = None
+        
     
 class ProtocolRequest():
-    type = None
-    data_list = []
+    def __init__(self):
+        self.type = None
+        self.data_list = []
+    
     
 class ProtocolResponse():
-    type = None
-    result = None
-    data_list = []
+    def __init__(self):
+        self.type = None
+        self.result = None
+        self.data_list = []
     
 class ProtocolDataNull():
     pass
 
 class ProtocolDataResult():
-    code = None
-    reason = None
-    msg = None
+    def __init__(self):
+        self.code = None
+        self.reason = None
+        self.msg = None
+        
 
 class ProtocolDataItemArray():
-    name = None
-    description = None
-    item_list = []
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.item_list = []
 
 class ProtocolDataItemList():
-    name = None
-    description = None
-    item_list = []
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.item_list = []
 
 class ProtocolDataItemSingelField():
-    name = None
-    type = None
-    description = None
+    def __init__(self):
+        self.name = None
+        self.type = None
+        self.description = None
 
 class ProtocolDataItemComplexField():
-    name = None
-    description = None
-    field_dict = {}
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.field_dict = OrderedDict({})
