@@ -15,6 +15,16 @@ def convertClassName(name):
         class_name += item.capitalize()
     return class_name
 
+def convertFieldName(name):
+    items = name.split('_')
+    class_name = ''
+    for index, item in enumerate(items):
+        if index:
+            class_name += item.capitalize()
+        else:
+            class_name +=item
+    return class_name
+
 class Protocol():
     def __init__(self):
         self.request = None

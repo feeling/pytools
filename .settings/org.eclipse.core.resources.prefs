@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//out/protocol.as=UTF-8
 encoding//out/protocol_message.py=UTF-8
 encoding//out/protocol_packet_id.py=UTF-8
 encoding//pyexcel2sc/Excel2sc.py=utf-8
@@ -7,3 +8,4 @@ encoding//pyprotocol2sc/generate.py=utf-8
 encoding//pyprotocol2sc/protocol.py=utf-8
 encoding//pyprotocol2sc/protocol2sc_main.py=utf-8
 encoding//pyprotocol2sc/xmltool.py=utf-8
+encoding/<project>=UTF-8
