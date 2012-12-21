@@ -6,8 +6,8 @@
 			<xs:choice>
 				<xs:element ref="ItemComplexField"/>
 			</xs:choice>
-			<xs:attribute name="name" use="required"/>
-			<xs:attribute name="description" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="description" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="ItemArray">
@@ -33,10 +33,25 @@
 	</xs:element>
 	<xs:element name="ItemSingleField">
 		<xs:complexType>
-			<xs:attribute name="name"/>
-			<xs:attribute name="type"/>
-			<xs:attribute name="description"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="I"/>
+						<xs:enumeration value="i"/>
+						<xs:enumeration value="B"/>
+						<xs:enumeration value="b"/>
+						<xs:enumeration value="H"/>
+						<xs:enumeration value="h"/>
+						<xs:enumeration value="32s"/>
+						<xs:enumeration value="64s"/>
+						<xs:enumeration value="string"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="description" type="xs:string" use="required"/>
 		</xs:complexType>
+
 	</xs:element>
 	<xs:element name="Protocols">
 		<xs:annotation>
@@ -103,9 +118,9 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:all>
-			<xs:attribute name="id" type="xs:long" use="required"/>
+			<xs:attribute name="id" type="xs:int" use="required"/>
 			<xs:attribute name="name" type="xs:string" use="required"/>
-			<xs:attribute name="description" use="required"/>
+			<xs:attribute name="description" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="DataGroup">
