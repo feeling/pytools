@@ -41,6 +41,7 @@ def parseRequest(request_node, request):
 def parseResponse(response_node, response):
     children = response_node.childNodes
     response.type = response_node.attributes['type'].value
+    response.direction = response_node.attributes['direction'].value
     for node in children:
         if node.nodeName == 'DataGroup':
             parseDataGroup(node, response)

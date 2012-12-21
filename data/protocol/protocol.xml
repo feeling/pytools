@@ -6,7 +6,7 @@
 		<Request type="C2G">
 			<Null />
 		</Request>
-		<Response type="G2C">
+		<Response type="G2C" direction="ACK">
 			<Result code="" reason="" msg=""/>
 			<DataGroup>
 				<ItemComplexField name="character_short" description="角色基本信息">
