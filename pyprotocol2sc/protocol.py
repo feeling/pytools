@@ -45,7 +45,7 @@ class ProtocolRequest():
                 continue
             else:
                 head += '%s, '%(convertClassName(item.name))
-        head = head[0:len(head)-1] + ')'
+        head = head[0:len(head)-2] + ')'
         return head
     
     

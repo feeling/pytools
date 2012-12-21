@@ -6,7 +6,7 @@ protocol_filename = '*'
 import ConfigParser   
 cf = ConfigParser.ConfigParser()
 try: 
-    cf.read('config-excel.ini')
+    cf.read('config-protocol.ini')
     if cf.has_option('input', 'protocol_dir'):
         protocol_dir = cf.get('input','protocol_dir') 
     if cf.has_option('input', 'protocol_filename'):

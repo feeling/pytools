@@ -6,6 +6,10 @@ Created on 2012-12-19
 
 @author: hill
 '''
+import sys  
+reload(sys)  
+sys.setdefaultencoding('utf-8') 
+
 from pyprotocol2sc.xmltool import *
 from  xml.dom import  minidom
 from pyprotocol2sc.protocol import Protocol, ProtocolRequest, ProtocolResponse,\
@@ -138,10 +142,10 @@ def main():
         for name in files:
             for pattern in patterns:
                 if fnmatch.fnmatch(name,pattern):
-                    print name
                     currentFileName= os.path.splitext(name)[0]
                     excelFile = os.path.join(root,name)
                     if protocol_filename == '*' or (protocol_filename != '*' and protocol_filename == name):
+                        print name
                         parse_xml(excelFile, currentFileName)
                         break
 

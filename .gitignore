@@ -1,6 +1,7 @@
 *.pid
 *.pyc
 *.log
+*.spec
 log/
 logs
 .settings
