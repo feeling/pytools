@@ -121,7 +121,7 @@ def generatePythonMessage(protocols, filename):
         if p.response and p.response.data_list:
             __generate_message_data_list(p.response.data_list, stream)
 
-    f = open(data_python_dir + '/'+filename+'_message.py', 'w')
+    f = open(data_python_dir + '/GateWay/'+filename+'_message.py', 'w')
     f.write(stream.getvalue())
     f.close()
 
