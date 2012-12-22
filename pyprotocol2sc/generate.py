@@ -34,6 +34,41 @@ as_write_dict = {'i':'    %s//%s\n    %smsgBody.writeInt(%s);\n',
             '32s':'    %s//%s\n    %smsgBody.writeBytes(autoCompleByte(%s,32));\n',
             '64s':'    %s//%s\n    %smsgBody.writeBytes(autoCompleByte(%s,64));\n',
             }
+python_file_code = '#!/usr/bin/python\n\
+# -*- coding: utf-8 -*- \n\n'
+
+python_client_file_header = 'from lib.packet_ids import *\n\
+from lib.package import Request, Result, Response\n\
+from GateWay.handler.client import append_char_id\n\
+from GateWay.message import *\n\
+from GateWay.protocol.client import REQUEST_HANDLERS_DICT, REQUEST_PACKAGES_DICT,RESPONSE_PACKAGES_DICT\n\
+from lib import log\n\n'
+python_client_file_footer = 'repeat_handler_keys = set(REQUEST_HANDLERS_DICT.keys()) & set(REQUEST_HANDLERS.keys())\n\
+repeat_request_keys = set(REQUEST_PACKAGES_DICT.keys()) & set(REQUEST_PACKAGES.keys())\n\
+repeat_response_keys = set(RESPONSE_PACKAGES_DICT.keys()) & set(RESPONSE_PACKAGES.keys())\n\
+if repeat_handler_keys or repeat_request_keys or repeat_response_keys:\n\
+    log.err(\'[ERROR] repeat key: REQUEST_HANDLERS-%s, REQUEST_PACKAGES-%s, RESPONSE_PACKAGES-%s\'%(repeat_handler_keys, repeat_request_keys, repeat_response_keys))\n\
+REQUEST_HANDLERS_DICT.update(REQUEST_HANDLERS)\n\
+REQUEST_PACKAGES_DICT.update(REQUEST_PACKAGES)\n\
+RESPONSE_PACKAGES_DICT.update(RESPONSE_PACKAGES)'
+
+python_game_file_header = 'from lib.packet_ids import *\n\
+from GateWay.handler.game import pop_char_id\n\
+from GateWay.protocol.game import REQUEST_HANDLERS_DICT\n\
+from lib import log\n\n'
+python_game_file_footer = 'repeat_handler_keys = set(REQUEST_HANDLERS_DICT.keys()) & set(REQUEST_HANDLERS.keys())\n\
+if repeat_handler_keys:\n\
+    log.err(\'[ERROR] repeat key: REQUEST_HANDLERS-%s\'%(repeat_handler_keys))\n\
+REQUEST_HANDLERS_DICT.update(REQUEST_HANDLERS)'
+
+python_gateway_file_header = 'from lib.packet_ids import *\n\
+from GameServer.protocol.gateway import REQUEST_HANDLERS_DICT\n\
+from lib import log\n\
+from GameServer.handler.%s_handler import * \n\n'
+python_gateway_file_footer = 'repeat_handler_keys = set(REQUEST_HANDLERS_DICT.keys()) & set(REQUEST_HANDLERS.keys())\n\
+if repeat_handler_keys:\n\
+    log.err(\'[ERROR] repeat key: REQUEST_HANDLERS-%s\'%(repeat_handler_keys))\n\
+REQUEST_HANDLERS_DICT.update(REQUEST_HANDLERS)'
 
 def generateCode(protocols, filename):
         generateAs(protocols, filename)
@@ -91,23 +126,54 @@ def generatePythonMessage(protocols, filename):
     f.close()
 
 def generatePythonProtocol(protocols, filename):
-    request_packages= 'REQUEST_PACKAGES = {\n'
-    request_handlers= 'REQUEST_HANDLERS = {\n'
-    response_packages= 'RESPONSE_PACKAGES = {\n'
+    request_packages_client= 'REQUEST_PACKAGES = {\n'
+    request_handlers_client= 'REQUEST_HANDLERS = {\n'
+    response_packages_client= 'RESPONSE_PACKAGES = {\n'
+    request_handlers_gateway= 'REQUEST_HANDLERS = {\n'
+    request_handlers_game= 'REQUEST_HANDLERS = {\n'
+    request_handlers_define = ''
     for p in protocols:
         upper_name = p.name.upper()
         if p.request:
-            request_packages += '    %s_REQ_%s : %s,\n'%( p.request.type, upper_name, p.request.generate_head_package())
-            request_handlers += '    %s_REQ_%s : append_char_id,\n'%( p.request.type, upper_name)
+            request_packages_client += '    %s_REQ_%s : %s,\n'%( p.request.type, upper_name, p.request.generate_head_package())
+            request_handlers_client += '    %s_REQ_%s : append_char_id,\n'%( p.request.type, upper_name)
+            request_handlers_gateway += '    %s_REQ_%s : %s_handler,\n'%( p.request.type, upper_name, p.name)
+            request_handlers_game += '    %s_%s_%s : pop_char_id,\n'%( p.response.type, p.response.direction, upper_name)
+            request_handlers_define +='def %s_handler(p, msgid, data):\n    \n    \'\'\' %s \'\'\'\n    pass\n\n'%(p.name, p.description)
         if p.response:
-            response_packages +='    %s_%s_%s : %s,\n'%(p.response.type,p.response.direction, upper_name, p.response.generate_head_package())
-    request_packages += '}\n\n'
-    request_handlers += '}\n\n'
-    response_packages += '}\n\n'
-    f = open(data_python_dir + '/'+filename+'_protocol.py', 'w')
-    f.write('%s%s%s'%(request_packages, request_handlers, response_packages))
+            response_packages_client +='    %s_%s_%s : %s,\n'%(p.response.type,p.response.direction, upper_name, p.response.generate_head_package())
+    request_packages_client += '}\n\n'
+    request_handlers_client += '}\n\n'
+    response_packages_client += '}\n\n'
+    request_handlers_gateway +=  '}\n\n'
+    request_handlers_game +=  '}\n\n'
+    f = open(data_python_dir + '/'+filename+'_clients_protocol.py', 'w')
+    f.write(python_file_code)
+    f.write(python_client_file_header)
+    f.write(request_packages_client)
+    f.write(request_handlers_client)
+    f.write(response_packages_client)
+    f.write(python_client_file_footer)
+    f.close()
+    
+    f = open(data_python_dir + '/'+filename+'_games_protocol.py', 'w')
+    f.write(python_file_code)
+    f.write(python_game_file_header)
+    f.write(request_handlers_game)
+    f.write(python_game_file_footer)
+    f.close()
+    
+    f = open(data_python_dir + '/'+filename+'_gateways_protocol.py', 'w')
+    f.write(python_file_code)
+    f.write(python_gateway_file_header%filename)
+    f.write(request_handlers_gateway)
+    f.write(python_gateway_file_footer)
     f.close()
 
+    f = open(data_python_dir + '/'+filename+'_handler.py', 'w')
+    f.write(python_file_code)
+    f.write(request_handlers_define)
+    f.close()
 
     
 def __generate_message_data_list(data_list, stream):
