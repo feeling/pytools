@@ -74,7 +74,7 @@ typeAsReadDict = {'int':'    //%s\n    var %s:int = bytes.readInt();\n',
             'ubyte':'    //%s\n    var %s:uint = bytes.readUnsignedByte();\n',
             'long':'    //%s\n    var %s:int = bytes.readInt();bytes.readInt();//as not surport long\n',
             'ulong':'    //%s\n    var %s:uint = bytes.readUnsignedInt();bytes.readUnsignedInt();//as not surport long\n',
-            'string':'    //%s\n    var length:uint=bytes.readUnsignedShort(); \n    if(length) {\n        var %s:String = bytes.readMultiByte(length,CharCode.UTF8);\n    }\n',
+            'string':'    //%s\n    length = bytes.readUnsignedShort(); \n    if(length) {\n        var %s:String = bytes.readMultiByte(length,CharCode.UTF8);\n    }\n',
             }
 
 def processdomain(clomn, value):
@@ -136,6 +136,8 @@ def processRow(rowIndex, row, rowDict):
                 datatype = clientClomns.get(clomn)
             if datatype and datatype[0]  == 'string':
                 value = str(value)
+            elif datatype and datatype[0] and not value:
+                value = 0                
             rowDict[clomn] = value
 
 def generateCreateSql():
@@ -149,7 +151,7 @@ def generateCreateSql():
     return createSql
 
 def generateAs():
-    asCode = 'var bytes:ByteArray = res.data;\nbytes.endian=Endian.LITTLE_ENDIAN;\nbytes.position=0;\nvar listLength:int=bytes.readUnsignedShort();\nfor(var i:uint=0;i<listLength;i++){\n'
+    asCode = 'var length:int = 0;\nvar bytes:ByteArray = res.data;\nbytes.endian=Endian.LITTLE_ENDIAN;\nbytes.position=0;\nvar listLength:int=bytes.readUnsignedShort();\nfor(var i:uint=0;i<listLength;i++){\n'
     for k,v in clientClomns.iteritems():
         line = typeAsReadDict[v[0]]
         asCode += line%(v[3],v[2])
@@ -190,7 +192,6 @@ def packDataList(dataList):
                     clientStr.write(clientClomnsPack(*cell))
                 elif clientClomnsPack:
                     clientStr.write(clientClomnsPack(cell))
-            print rowIndex, row
         insertHead = insertHead[0:len(insertHead)-2] + ');\n'
         serverStr.write(insertHead)
     f = open(data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
