@@ -92,7 +92,7 @@ def generateAs(protocols, filename):
             read_str +=  __generate_as_read_data_list(p.response.data_list, 0)
             read_str +='}'
 
-    f = open(data_as_dir + '/'+filename+'.as', 'w')
+    f = open(data_as_dir + '/as/'+filename+'.as', 'w')
     f.write(read_str)
     f.write('\n\n')
     f.write(write_str)
@@ -147,7 +147,7 @@ def generatePythonProtocol(protocols, filename):
     response_packages_client += '}\n\n'
     request_handlers_gateway +=  '}\n\n'
     request_handlers_game +=  '}\n\n'
-    f = open(data_python_dir + '/'+filename+'_clients_protocol.py', 'w')
+    f = open(data_python_dir + '/GateWay/protocol/clients/'+filename+'_clients_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_client_file_header)
     f.write(request_packages_client)
@@ -156,21 +156,21 @@ def generatePythonProtocol(protocols, filename):
     f.write(python_client_file_footer)
     f.close()
     
-    f = open(data_python_dir + '/'+filename+'_games_protocol.py', 'w')
+    f = open(data_python_dir + '/GateWay/protocol/games/'+filename+'_games_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_game_file_header)
     f.write(request_handlers_game)
     f.write(python_game_file_footer)
     f.close()
     
-    f = open(data_python_dir + '/'+filename+'_gateways_protocol.py', 'w')
+    f = open(data_python_dir + '/GameServer/protocol/gateways/'+filename+'_gateways_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_gateway_file_header%filename)
     f.write(request_handlers_gateway)
     f.write(python_gateway_file_footer)
     f.close()
 
-    f = open(data_python_dir + '/'+filename+'_handler.py', 'w')
+    f = open(data_python_dir + '/GameServer/handler/'+filename+'_handler.py', 'w')
     f.write(python_file_code)
     f.write(request_handlers_define)
     f.close()
