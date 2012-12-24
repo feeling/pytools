@@ -129,7 +129,7 @@ def parseDataItemList(itemListNode):
             item_list.item_list.append(parseDataItemComplexField(node))
     return item_list
 
-def parse_xml(xml_file, currentFileName):
+def parse_xml(xml_file, currentdir, currentFileName):
     doc = minidom.parse(xml_file) 
     root = doc.documentElement
     protocol_nodes = get_nodes_by_name(root,'Protocol')
@@ -138,10 +138,10 @@ def parse_xml(xml_file, currentFileName):
         protocol = Protocol()
         protocols.append(protocol)
         parseProtocol(protocol_node, protocol)
-    generateCode(protocols, currentFileName);
+    generateCode(protocols, currentdir, currentFileName);
 
 def main():
-    currentdir = get_main_dir()
+    currentdir = get_main_dir()+'/'
     print 'currentdir:', currentdir
     os.chdir(currentdir)
     patterns = ['*.xml']
@@ -154,9 +154,10 @@ def main():
                     currentFileName= os.path.splitext(name)[0]
                     excelFile = os.path.join(root,name)
                     print name
-                    parse_xml(excelFile, currentFileName)
+                    parse_xml(excelFile, currentdir, currentFileName)
                     break
 
         
 if __name__ == '__main__':
     main()
+    raw_input('...>')

@@ -171,7 +171,7 @@ def packDataList(dataList):
         serverStr.write(generateCreateSql())
     if isGenerateAs:
         asStr.write(generateAs())
-        f = open(data_as_dir + '/'+currentFileName+'.as', 'w')
+        f = open(currentdir + data_as_dir + '/'+currentFileName+'.as', 'w')
         f.write(asStr.getvalue())
         f.close()
     print  len(dataList)
@@ -199,10 +199,10 @@ def packDataList(dataList):
                     print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
         insertHead = insertHead[0:len(insertHead)-2] + ');\n'
         serverStr.write(insertHead)
-    f = open(data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
+    f = open(currentdir + data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
     f.write(serverStr.getvalue())
     f.close()
-    f = open(data_dat_dir + '/'+currentFileName+'.dat', 'wb')
+    f = open(currentdir + data_dat_dir + '/'+currentFileName+'.dat', 'wb')
     f.write(clientStr.getvalue())
     f.close()
 def parseExcel(excelFile):
@@ -222,7 +222,9 @@ def parseExcel(excelFile):
     packDataList(sheetRowList)
     
 if __name__ == '__main__':
-    currentdir = get_main_dir()
+    global currentdir
+    global currentFileName
+    currentdir = get_main_dir()+'/'
     print 'currentdir:', currentdir
     os.chdir(currentdir)
     patterns = ['*.xls', '*.xlsx']
@@ -237,4 +239,4 @@ if __name__ == '__main__':
                     print name
                     parseExcel(excelFile)
                     break
-    
+    raw_input('input enter...>') 

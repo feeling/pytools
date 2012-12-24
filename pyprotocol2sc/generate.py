@@ -72,14 +72,14 @@ REQUEST_HANDLERS_DICT.update(REQUEST_HANDLERS)'
 
 message_class_dict = {}
 
-def generateCode(protocols, filename):
-        generateAs(protocols, filename)
-        generatePythonPacketId(protocols, filename) 
-        generatePythonMessage(protocols, filename)
-        generatePythonProtocol(protocols, filename)
+def generateCode(protocols, currentdir, filename):
+        generateAs(protocols, currentdir,  filename)
+        generatePythonPacketId(protocols,  currentdir, filename) 
+        generatePythonMessage(protocols,  currentdir, filename)
+        generatePythonProtocol(protocols,  currentdir, filename)
         
         
-def generateAs(protocols, filename):
+def generateAs(protocols, currentdir, filename):
     read_str = ''
     write_str = ''
     for p in protocols:
@@ -93,13 +93,13 @@ def generateAs(protocols, filename):
             read_str +=  __generate_as_read_data_list(p.response.data_list, 1)
             read_str +='    }\n}\n'
 
-    f = open(data_as_dir + '/as/'+filename+'.as', 'w')
+    f = open(currentdir + data_as_dir + '/as/'+filename+'.as', 'w')
     f.write(read_str)
     f.write('\n\n')
     f.write(write_str)
     f.close()
 
-def generatePythonPacketId(protocols, filename):
+def generatePythonPacketId(protocols, currentdir, filename):
     stream = StringIO()
     for p in protocols:
         packet_id = int(p.id)
@@ -110,11 +110,11 @@ def generatePythonPacketId(protocols, filename):
         if p.response:
             stream.write('%s_ACK_%s = %d\n\n\n'%(p.response.type, upper_name, packet_id))
             
-    f = open(data_python_dir + '/'+filename+'_packet_id.py', 'w')
+    f = open(currentdir + data_python_dir + '/'+filename+'_packet_id.py', 'w')
     f.write(stream.getvalue())
     f.close()
 
-def generatePythonMessage(protocols, filename):
+def generatePythonMessage(protocols, currentdir, filename):
     stream = StringIO()
     for p in protocols:
         if p.request and p.request.data_list:
@@ -122,11 +122,11 @@ def generatePythonMessage(protocols, filename):
         if p.response and p.response.data_list:
             __generate_message_data_list(p.response.data_list, stream)
 
-    f = open(data_python_dir + '/GateWay/'+filename+'_message.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/'+filename+'_message.py', 'w')
     f.write(stream.getvalue())
     f.close()
 
-def generatePythonProtocol(protocols, filename):
+def generatePythonProtocol(protocols, currentdir, filename):
     request_packages_client= 'REQUEST_PACKAGES = {\n'
     request_handlers_client= 'REQUEST_HANDLERS = {\n'
     response_packages_client= 'RESPONSE_PACKAGES = {\n'
@@ -148,7 +148,7 @@ def generatePythonProtocol(protocols, filename):
     response_packages_client += '}\n\n'
     request_handlers_gateway +=  '}\n\n'
     request_handlers_game +=  '}\n\n'
-    f = open(data_python_dir + '/GateWay/protocol/clients/'+filename+'_clients_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/protocol/clients/'+filename+'_clients_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_client_file_header)
     f.write(request_packages_client)
@@ -157,21 +157,21 @@ def generatePythonProtocol(protocols, filename):
     f.write(python_client_file_footer)
     f.close()
     
-    f = open(data_python_dir + '/GateWay/protocol/games/'+filename+'_games_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/protocol/games/'+filename+'_games_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_game_file_header)
     f.write(request_handlers_game)
     f.write(python_game_file_footer)
     f.close()
     
-    f = open(data_python_dir + '/GameServer/protocol/gateways/'+filename+'_gateways_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GameServer/protocol/gateways/'+filename+'_gateways_protocol.py', 'w')
     f.write(python_file_code)
     f.write(python_gateway_file_header%filename)
     f.write(request_handlers_gateway)
     f.write(python_gateway_file_footer)
     f.close()
 
-    f = open(data_python_dir + '/GameServer/handler/'+filename+'_handler.py', 'w')
+    f = open(currentdir + data_python_dir + '/GameServer/handler/'+filename+'_handler.py', 'w')
     f.write(python_file_code)
     f.write(request_handlers_define)
     f.close()
