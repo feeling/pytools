@@ -6,6 +6,8 @@ Created on 2012-12-8
 @author: Administrator
 '''
 import sys  
+from symbol import except_clause
+from lib.dir_utils import get_main_dir
 reload(sys)  
 sys.setdefaultencoding('utf-8') 
 
@@ -187,11 +189,14 @@ def packDataList(dataList):
             clientClomnsInfo = clientClomns.get(clomn)
             if clientClomnsInfo:
                 clientClomnsPack = clientClomnsInfo[1]
-                if('string' == clientClomnsInfo[0] and clientClomnsPack):
-                    cell = cell.encode('utf-8','ignore')
-                    clientStr.write(clientClomnsPack(*cell))
-                elif clientClomnsPack:
-                    clientStr.write(clientClomnsPack(cell))
+                try:
+                    if('string' == clientClomnsInfo[0] and clientClomnsPack):
+                        cell = cell.encode('utf-8','ignore')
+                        clientStr.write(clientClomnsPack(*cell))
+                    elif clientClomnsPack:
+                        clientStr.write(clientClomnsPack(cell))
+                except Exception, e:
+                    print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
         insertHead = insertHead[0:len(insertHead)-2] + ');\n'
         serverStr.write(insertHead)
     f = open(data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
@@ -216,17 +221,20 @@ def parseExcel(excelFile):
     
     packDataList(sheetRowList)
     
-                    
 if __name__ == '__main__':
+    currentdir = get_main_dir()
+    print 'currentdir:', currentdir
+    os.chdir(currentdir)
     patterns = ['*.xls', '*.xlsx']
-    for root, dirs, files in os.walk(excel_dir, True):
+    if excel_filename != '*':
+        patterns = excel_filename.split(',')
+    for root, dirs, files in os.walk(excel_dir, True):   
         for name in files:
             for pattern in patterns:
                 if fnmatch.fnmatch(name,pattern):
-                    print name
                     currentFileName= os.path.splitext(name)[0]
                     excelFile = os.path.join(root,name)
-                    if excel_filename == '*' or (excel_filename != '*' and excel_filename == name):
-                        parseExcel(excelFile)
-                        break
+                    print name
+                    parseExcel(excelFile)
+                    break
     

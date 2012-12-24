@@ -7,6 +7,7 @@ Created on 2012-12-19
 @author: hill
 '''
 import sys  
+from lib.dir_utils import get_main_dir
 reload(sys)  
 sys.setdefaultencoding('utf-8') 
 
@@ -140,17 +141,21 @@ def parse_xml(xml_file, currentFileName):
     generateCode(protocols, currentFileName);
 
 def main():
+    currentdir = get_main_dir()
+    print 'currentdir:', currentdir
+    os.chdir(currentdir)
     patterns = ['*.xml']
+    if protocol_filename != '*':
+        patterns = protocol_filename.split(',')
     for root, dirs, files in os.walk(protocol_dir, True):
         for name in files:
             for pattern in patterns:
                 if fnmatch.fnmatch(name,pattern):
                     currentFileName= os.path.splitext(name)[0]
                     excelFile = os.path.join(root,name)
-                    if protocol_filename == '*' or (protocol_filename != '*' and protocol_filename == name):
-                        print name
-                        parse_xml(excelFile, currentFileName)
-                        break
+                    print name
+                    parse_xml(excelFile, currentFileName)
+                    break
 
         
 if __name__ == '__main__':
