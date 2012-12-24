@@ -5,8 +5,8 @@
 	<Protocol id="131001" name="demo_protocol" description="一个例子">
 		<Request type="C2G">
 			<DataGroup>
+				<ItemSingleField name="char_id" type="I" description="char id"/>
 				<ItemComplexField name="character_short" description="角色基本信息">
-					<ItemSingleField name="char_id" type="I" description="char id"/>
 					<ItemSingleField name="char_name" type="string" description="char name"/>
 					<ItemSingleField name="sex" type="H" description="char sex"/>
 					<ItemSingleField name="career" type="H" description="char chareer"/>
@@ -102,6 +102,7 @@
 		<Response type="G2C" direction="ACK">
 			<Result code="" reason="" msg=""/>
 			<DataGroup>
+				<ItemSingleField name="char_id" type="I" description="char id"/>
 				<ItemComplexField name="character_short" description="角色基本信息">
 					<ItemSingleField name="char_id" type="I" description="char id"/>
 					<ItemSingleField name="char_name" type="string" description="char name"/>

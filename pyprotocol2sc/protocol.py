@@ -37,12 +37,12 @@ class ProtocolRequest():
         self.data_list = []
         
     def generate_head_package(self):
-        head = 'Request(  '
+        head = 'Request('
         for item in self.data_list:
             if isinstance(item, ProtocolDataItemSingelField):
-                head += '(\'%s\', %s)'%(item.name, item.type)
+                head += '(\'%s\', \'%s\'), '%(item.name, item.type)
             elif isinstance(item, ProtocolDataNull):
-                continue
+                head += '  '
             else:
                 head += '%s, '%(convertClassName(item.name))
         head = head[0:len(head)-2] + ')'
@@ -60,7 +60,7 @@ class ProtocolResponse():
         head = 'Response(Result, '
         for item in self.data_list:
             if isinstance(item, ProtocolDataItemSingelField):
-                head += '(\'%s\', %s)'%(item.name, item.type)
+                head += '\'%s\', '%(item.type)
             elif isinstance(item, ProtocolDataNull):
                 continue
             else:

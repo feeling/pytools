@@ -51,14 +51,13 @@
 			</xs:attribute>
 			<xs:attribute name="description" type="xs:string" use="required"/>
 		</xs:complexType>
-
 	</xs:element>
 	<xs:element name="Protocols">
 		<xs:annotation>
 			<xs:documentation>Comment describing your root element</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:choice>
+			<xs:choice maxOccurs="unbounded">
 				<xs:element ref="Protocol"/>
 			</xs:choice>
 		</xs:complexType>
