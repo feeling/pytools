@@ -83,14 +83,28 @@ class ProtocolDataItemArray():
     def __init__(self):
         self.name = None
         self.description = None
+        self.class_name = None
         self.item_list = []
 
+    def get_class_name(self):
+        if self.class_name:
+            return self.class_name
+        else :
+            return self.name
+        
 class ProtocolDataItemList():
     def __init__(self):
         self.name = None
         self.description = None
+        self.class_name = None
         self.item_list = []
 
+    def get_class_name(self):
+        if self.class_name:
+            return self.class_name
+        else :
+            return self.name
+        
 class ProtocolDataItemSingelField():
     def __init__(self):
         self.name = None
@@ -101,4 +115,13 @@ class ProtocolDataItemComplexField():
     def __init__(self):
         self.name = None
         self.description = None
+        self.class_name = None
         self.field_dict = OrderedDict({})
+        
+    def get_class_name(self):
+        if self.class_name:
+            return self.class_name
+        else :
+            return self.name
+            
+        

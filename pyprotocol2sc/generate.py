@@ -70,6 +70,8 @@ if repeat_handler_keys:\n\
     log.err(\'[ERROR] repeat key: REQUEST_HANDLERS-%s\'%(repeat_handler_keys))\n\
 REQUEST_HANDLERS_DICT.update(REQUEST_HANDLERS)'
 
+message_class_dict = {}
+
 def generateCode(protocols, filename):
         generateAs(protocols, filename)
         generatePythonPacketId(protocols, filename) 
@@ -82,15 +84,14 @@ def generateAs(protocols, filename):
     write_str = ''
     for p in protocols:
         if p.request and p.request.data_list:
-            write_str = 'public function write%s():void{\n'%(convertClassName(p.name))
-            write_str += '    var msgBody:ByteArray = new ByteArray()\n    msgBody.endian = Endian.LITTLE_ENDIAN;\n'
-            write_str +=  __generate_as_write_data_list(p.response.data_list, 0)
-            write_str +='    super.send(msgBody);\n}'
+            write_str += '\n//%s\npublic function write%s():void{\n'%(p.description, convertClassName(p.name))
+            write_str += '    var msgBody:ByteArray = new ByteArray();\n    msgBody.endian = Endian.LITTLE_ENDIAN;\n'
+            write_str +=  __generate_as_write_data_list(p.request.data_list, 0)
+            write_str +='    super.send(msgBody);\n}\n'
         if p.response and p.response.data_list:
-            read_str = 'public function read%s(res):void{\n'%(convertClassName(p.name))
-            read_str += '    var bytes:ByteArray = res.data;\n    bytes.endian=Endian.LITTLE_ENDIAN;\n    bytes.position=0;\n'
-            read_str +=  __generate_as_read_data_list(p.response.data_list, 0)
-            read_str +='}'
+            read_str += '\n//%s\n//read%s\noverride protected function parseBodyHandle(msgHeadVo:MsgHeadVo,g2cProtocol:int,bytes:ByteArray):void{\n    var code:int = msgHeadVo.code;\n    var reason:int = msgHeadVo.reason;\n    \n    if(code == 1){\n'%(p.description, convertClassName(p.name))
+            read_str +=  __generate_as_read_data_list(p.response.data_list, 1)
+            read_str +='    }\n}\n'
 
     f = open(data_as_dir + '/as/'+filename+'.as', 'w')
     f.write(read_str)
@@ -189,30 +190,41 @@ def __generate_message_data_list(data_list, stream):
             
 def __generate_message_data_item_array(item_array, stream):
     field = item_array.item_list[0]
-    message = 'class %s (Array):\n    #%s\n    field=\'%s\', \'%s\'\n\n'%(convertClassName(item_array.name), field.description, field.name, field.type)
-    stream.write(message)
+    class_name  = convertClassName(item_array.get_class_name())
+    if class_name not in message_class_dict:
+        message = 'class %s (Array):\n    #%s\n    field=\'%s\', \'%s\'\n\n'%(class_name, field.description, field.name, field.type)
+        stream.write(message)
+        message_class_dict[class_name] = 1
     
 def __generate_message_data_item_list(item_list, stream):
     field = item_list.item_list[0]
     __generate_message_data_item_complex_field(field,stream)
-    message = 'class %s (List):\n    #%s\n    Field=%s\n\n'%(convertClassName(item_list.name), field.description, convertClassName(field.name))
-    stream.write(message)
-    
+    class_name  = convertClassName(item_list.get_class_name())
+    if class_name not in message_class_dict:
+        message = 'class %s (List):\n    #%s\n    Field=%s\n\n'%(class_name, field.description, convertClassName(field.name))
+        stream.write(message)
+        message_class_dict[class_name] = 1
+            
 def __generate_message_data_item_single_field(item_field, stream):
     message = '(\'%s\',\'%s\')#%s\n'%( item_field.name, item_field.type, item_field.description)
     stream.write(message)
 
 def __generate_message_data_item_complex_field(item_field, stream):
     to_generate_list =[]
-    message = 'class %s (Field):\n    #%s\n    fields= (\n'%(convertClassName(item_field.name), item_field.description)
-    for k, v in item_field.field_dict.iteritems():
-        if isinstance(v, ProtocolDataItemArray) or isinstance(v, ProtocolDataItemList) or isinstance(v, ProtocolDataItemComplexField) :
-            to_generate_list.append(v)
-            message += '        (\'%s\', %s),\n'%(k, convertClassName(v.name))
-        else:
-            message += '        (\'%s\', \'%s\'),\n'%(k, v.type)
-            
-    message += '    )\n\n'
+    message = None
+    class_name  = convertClassName(item_field.get_class_name())
+    if class_name not in message_class_dict:
+        message = 'class %s (Field):\n    #%s\n    fields= (\n'%(class_name, item_field.description)
+        for k, v in item_field.field_dict.iteritems():
+            if isinstance(v, ProtocolDataItemArray) or isinstance(v, ProtocolDataItemList) or isinstance(v, ProtocolDataItemComplexField) :
+                to_generate_list.append(v)
+                message += '        (\'%s\', %s),\n'%(k, convertClassName(v.get_class_name()))
+            else:
+                message += '        (\'%s\', \'%s\'),\n'%(k, v.type)
+                
+        message += '    )\n\n'
+        message_class_dict[class_name] = 1
+        
     for data in to_generate_list:
         if isinstance(data, ProtocolDataItemArray):
             __generate_message_data_item_array(data,stream)
@@ -222,7 +234,8 @@ def __generate_message_data_item_complex_field(item_field, stream):
             __generate_message_data_item_single_field(data,stream)
         elif isinstance(data, ProtocolDataItemComplexField):
             __generate_message_data_item_complex_field(data,stream)
-    stream.write(message)
+    if message:
+        stream.write(message)
     
     
     
@@ -246,8 +259,8 @@ def __generate_as_read_data_item_array(item_array, name='',tabs_num=0):
     name = convertFieldName(name)
     blank = '    '
     blank *=tabs_num
-    rev = '    %s//%s\n    var %sLength:uint=bytes.readUnsignedShort(); \n    for(var %sIndex:int=0; %sIndex < %sLength; %sIndex++) {\n        '\
-            %(blank, item_array.description, name, name, name, name, name )
+    rev = '    %s//%s\n    %svar %sLength:uint=bytes.readUnsignedShort(); \n    %sfor(var %sIndex:int=0; %sIndex < %sLength; %sIndex++) {\n'\
+            %(blank, item_array.description,blank, name,blank, name, name, name, name )
     rev += __generate_as_read_data_item_single_field(field, '', tabs_num+1)
     rev += '    %s}\n'%blank
     return rev
@@ -260,8 +273,8 @@ def __generate_as_read_data_item_list(item_list, name='',tabs_num=0):
     name = convertFieldName(name)
     blank = '    '
     blank *=tabs_num
-    rev = '    %s//%s\n    %svar %sLength:uint=bytes.readUnsignedShort(); \n    %sfor(var %sIndex:int=0; %sIndex < %sLength; %sIndex++) {\n%s'\
-            %(blank, item_list.description,blank, name, blank,name, name, name, name, blank )
+    rev = '    %s//%s\n    %svar %sLength:uint=bytes.readUnsignedShort(); \n    %sfor(var %sIndex:int=0; %sIndex < %sLength; %sIndex++) {\n'\
+            %(blank, item_list.description,blank, name, blank,name, name, name, name )
     rev += __generate_as_read_data_item_complex_field(field, '', tabs_num+1)
     rev += '    %s}\n'%blank
     return rev

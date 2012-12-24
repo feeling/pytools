@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./schema/Protocol.xsd">
+	<Protocol id="390004" name="guess_boss_dungeon_enter" description="从真假武将列表中选择要进入的真假武将副本">
+		<Request type="C2G">
+			<DataGroup>
+				<ItemSingleField name="guess_boss_dungeon_index" type="B" description="真假武将副本在列表中的次序"/>
+			</DataGroup>
+		</Request>
+		<Response type="G2C" direction="ACK">
+			<Result code="" reason="" msg=""/>
+			<Null/>
+		</Response>
+	</Protocol>
+	
+	<Protocol id="390006" name="guess_boss_dungeon_enter_battle" description="选择副本中的武将，进入战斗">
+		<Request type="C2G">
+			<DataGroup>
+				<ItemSingleField name="target_pos" type="B" description="武将的位置"/>
+			</DataGroup>
+		</Request>
+		<Response type="G2C" direction="ACK">
+			<Result code="" reason="" msg=""/>
+			<DataGroup>
+				<ItemComplexField description="战斗序列信息" name="battle_info">
+						<ItemSingleField type="B" description="站位明雷的位置" name="enemy_pos"/>
+						<ItemSingleField type="B" description="是否成功杀死敌人" name="is_win" />
+						<ItemArray description="己方生命值数组" name="self_life_list" class_name="fighter_life_list">
+							<ItemSingleField type="I" description="生命值" name="life"></ItemSingleField>
+						</ItemArray>
+						<ItemArray description="敌方生命值数组" name="enemy_life_list" class_name="fighter_life_list">
+							<ItemSingleField type="I" description="生命值" name="life"></ItemSingleField>
+						</ItemArray>
+						<ItemList description="轮次序列" name="battle_round_list">
+							<ItemComplexField description="单轮攻击信息" name="battle_round">
+								<ItemArray description="阵法触发的轮次buffer列表" name="round_buffer_id_list"  class_name="battle_buffer_id_list">
+									<ItemSingleField type="H" description="阵法触发的轮次buffer id" name="buffer_id"></ItemSingleField>
+								</ItemArray>
+								<ItemList description="单轮攻击序列" name="battle_attack_list">
+									<ItemComplexField description="攻击序列" name="battle_attack">
+										<ItemSingleField type="B" description="是否是当前玩家" name="is_current_character"></ItemSingleField>
+										<ItemSingleField type="B" description="是否是攻击自身队伍" name="is_attack_self"></ItemSingleField>
+										<ItemSingleField type="B" description="攻方位置" name="attacker_pos"></ItemSingleField>
+										<ItemSingleField type="B" description="攻击区域" name="attack_area"></ItemSingleField>
+										<ItemSingleField type="B" description="是否所无双攻击" name="is_skill_attack"></ItemSingleField>
+										<ItemSingleField type="B" description="是否是暴击" name="is_critical_hit"></ItemSingleField>
+										<ItemSingleField type="B" description="是否所命中" name="is_direct_hit"></ItemSingleField>
+										<ItemList description="被攻击对象列表" name="attacked_target_list">
+											<ItemComplexField description="被攻击对象" name="attacked_target">
+												<ItemSingleField type="B" description="目标pos" name="target_pos"></ItemSingleField>
+												<ItemSingleField type="I" description="伤害值" name="hurt"></ItemSingleField>
+												<ItemSingleField type="B" description="是否闪避" name="is_missed"></ItemSingleField>
+												<ItemSingleField type="B" description="是否格挡" name="is_blocked"></ItemSingleField>
+												<ItemSingleField type="B" description="是否反击" name="is_counter_attack"></ItemSingleField>
+											</ItemComplexField>
+										</ItemList>
+										<ItemArray description="攻击buffer id列表" name="attack_buffer_id_list" class_name="battle_buffer_id_list">
+											<ItemSingleField type="H" description="攻击bufferid" name="buffer_id"></ItemSingleField>
+										</ItemArray>
+									</ItemComplexField>
+								</ItemList>
+							</ItemComplexField>
+						</ItemList>
+				</ItemComplexField>
+			</DataGroup>
+		</Response>
+	</Protocol>
+	
+	<Protocol id="390008" name="guess_boss_dungeon_remove_fake" description="移除副本中的一个假武将">
+		<Request type="C2G">
+			<Null/>
+		</Request>
+		<Response type="G2C" direction="ACK">
+			<Result code="" reason="" msg=""/>
+			<DataGroup>
+				<ItemSingleField name="removed_fake_pos" type="B" description="武将的位置"/>
+			</DataGroup>
+		</Response>
+	</Protocol>
+	
+	<Protocol id="390010" name="guess_boss_dungeon_kill_genuine" description="杀死了真正的武将">
+		<Request type="C2G">
+			<DataGroup>
+				<ItemSingleField name="target_pos" type="B" description="武将的位置"/>
+			</DataGroup>
+		</Request>
+		<Response type="G2C" direction="ACK">
+			<Result code="" reason="" msg=""/>
+			<DataGroup>
+				<ItemList description="奖励物品列表" name="guess_boss_reward_list">
+					<ItemComplexField description="奖品信息" name="guess_boss_reward_info">
+						<ItemSingleField description="奖品id" name="reward_id" type="H"/>
+						<ItemSingleField description="奖品数量" name="reward_num" type="b"/>
+					</ItemComplexField>
+				</ItemList>
+				<ItemList description="奖励物品存入背包信息列表" name="bag_item_add_info_list">
+					<ItemComplexField description="奖励物品存入背包信息" name="bag_item_add_info">
+						<ItemSingleField description="奖品道具id" name="item_id" type="H"/>
+						<ItemSingleField description="存入背包位置" name="item_pos" type="H"/>
+						<ItemSingleField description="奖品增加数量" name="item_num" type="I"/>
+						<ItemSingleField description="奖品等级" name="item_level" type="B"/>
+					</ItemComplexField>
+				</ItemList>
+			</DataGroup>
+		</Response>
+	</Protocol>
+</Protocols>

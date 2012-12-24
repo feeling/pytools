@@ -82,6 +82,7 @@ def parseDataTtemArray(itemArrayNode):
     item_array = ProtocolDataItemArray()
     item_array.name = itemArrayNode.attributes['name'].value
     item_array.description = itemArrayNode.attributes['description'].value
+    item_array.class_name = get_node_attribute_value_by_name(itemArrayNode,'class_name')
     for node in children:
         if node.nodeName == 'ItemSingleField':
             item_array.item_list.append(parseDataItemSingleField(node))
@@ -100,6 +101,7 @@ def parseDataItemComplexField(itemComplexFieldNode):
     children = itemComplexFieldNode.childNodes
     item_complex_field.name  = itemComplexFieldNode.attributes['name'].value
     item_complex_field.description  = itemComplexFieldNode.attributes['description'].value
+    item_complex_field.class_name  = get_node_attribute_value_by_name(itemComplexFieldNode,'class_name')
     for node in children:
         if node.nodeName == 'ItemArray':
             name = node.attributes['name'].value
@@ -120,6 +122,7 @@ def parseDataItemList(itemListNode):
     item_list = ProtocolDataItemList()
     item_list.name = itemListNode.attributes['name'].value
     item_list.description = itemListNode.attributes['description'].value
+    item_list.class_name = get_node_attribute_value_by_name(itemListNode,'class_name')
     for node in children:
         if node.nodeName == 'ItemComplexField':
             item_list.item_list.append(parseDataItemComplexField(node))
