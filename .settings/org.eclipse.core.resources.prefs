@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//lib/dir_utils.py=utf-8
+encoding//out/GameServer/handler/guess_boss_handler.py=utf-8
 encoding//out/GameServer/handler/protocol_handler.py=utf-8
 encoding//out/GameServer/protocol/gateways/protocol_gateways_protocol.py=utf-8
 encoding//out/GateWay/protocol/clients/guess_boss_clients_protocol.py=utf-8

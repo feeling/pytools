@@ -140,7 +140,7 @@ def generatePythonProtocol(protocols, currentdir, filename):
             request_handlers_client += '    %s_REQ_%s : append_char_id,\n'%( p.request.type, upper_name)
             request_handlers_gateway += '    %s_REQ_%s : %s_handler,\n'%( p.request.type, upper_name, p.name)
             request_handlers_game += '    %s_%s_%s : pop_char_id,\n'%( p.response.type, p.response.direction, upper_name)
-            request_handlers_define +='def %s_handler(p, msgid, data):\n    \n    \'\'\' %s \'\'\'\n    pass\n\n'%(p.name, p.description)
+            request_handlers_define +='def %s_handler(p, msgid, data):\n    \'\'\' %s \'\'\'\n    pass\n\n'%(p.name, p.description)
         if p.response:
             response_packages_client +='    %s_%s_%s : %s,\n'%(p.response.type,p.response.direction, upper_name, p.response.generate_head_package())
     request_packages_client += '}\n\n'
