@@ -84,12 +84,12 @@ def generateAs(protocols, currentdir, filename):
     write_str = ''
     for p in protocols:
         if p.request and p.request.data_list:
-            write_str += '\n//%s\npublic function write%s():void{\n'%(p.description, convertClassName(p.name))
+            write_str += '\n/**\n *%s\n *%s\n */\npublic function write%s():void{\n'%(p.description,p.request.description, convertClassName(p.name))
             write_str += '    var msgBody:ByteArray = new ByteArray();\n    msgBody.endian = Endian.LITTLE_ENDIAN;\n'
             write_str +=  __generate_as_write_data_list(p.request.data_list, 0)
             write_str +='    super.send(msgBody);\n}\n'
         if p.response and p.response.data_list:
-            read_str += '\n//%s\n//read%s\noverride protected function parseBodyHandle(msgHeadVo:MsgHeadVo,g2cProtocol:int,bytes:ByteArray):void{\n    var code:int = msgHeadVo.code;\n    var reason:int = msgHeadVo.reason;\n    \n    if(code == 1){\n'%(p.description, convertClassName(p.name))
+            read_str += '\n/**\n *%s\n *%s\n *read%s\n */\noverride protected function parseBodyHandle(msgHeadVo:MsgHeadVo,g2cProtocol:int,bytes:ByteArray):void{\n    var code:int = msgHeadVo.code;\n    var reason:int = msgHeadVo.reason;\n    \n    if(code == 1){\n'%(p.description,p.response.description, convertClassName(p.name))
             read_str +=  __generate_as_read_data_list(p.response.data_list, 1)
             read_str +='    }\n}\n'
 

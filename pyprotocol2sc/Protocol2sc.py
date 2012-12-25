@@ -36,6 +36,7 @@ def parseProtocol(protocol_node, protocol):
 def parseRequest(request_node, request):
     children = request_node.childNodes
     request.type = request_node.attributes['type'].value
+    request.description = get_node_attribute_value_by_name(request_node, 'request_node')
     for node in children:
         if node.nodeName == 'DataGroup':
             parseDataGroup(node, request)
@@ -46,7 +47,8 @@ def parseRequest(request_node, request):
 def parseResponse(response_node, response):
     children = response_node.childNodes
     response.type = response_node.attributes['type'].value
-    response.direction = response_node.attributes['direction'].value
+    response.direction = get_node_attribute_value_by_name(response_node, 'direction', 'ACK')
+    response.description = get_node_attribute_value_by_name(response_node, 'description')
     for node in children:
         if node.nodeName == 'DataGroup':
             parseDataGroup(node, response)

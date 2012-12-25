@@ -6,7 +6,7 @@
 				<ItemSingleField name="guess_boss_dungeon_index" type="B" description="真假武将副本在列表中的次序"/>
 			</DataGroup>
 		</Request>
-		<Response type="G2C" direction="ACK">
+		<Response type="G2C" description="选择副本应答"> 
 			<Result code="" reason="" msg=""/>
 			<Null/>
 		</Response>

@@ -34,6 +34,7 @@ class Protocol():
 class ProtocolRequest():
     def __init__(self):
         self.type = None
+        self.description = None
         self.data_list = []
         
     def generate_head_package(self):
@@ -53,6 +54,7 @@ class ProtocolResponse():
     def __init__(self):
         self.type = None
         self.direction = None
+        self.description = None
         self.result = None
         self.data_list = []
     
