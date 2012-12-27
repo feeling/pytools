@@ -137,12 +137,16 @@ def processRow(rowIndex, row, rowDict):
             if not datatype:
                 datatype = clientClomns.get(clomn)
             if datatype and datatype[0]  == 'string':
-                value = str(value)
+                if not value:
+                    value = ''
+                value = str(value) 
             elif datatype and datatype[0] and not value:
                 value = 0                
             rowDict[clomn] = value
 
 def generateCreateSql():
+    if not serverClomns:
+        return
     createSql = 'drop table if exists `m_%s`;\nCREATE TABLE `m_%s` (\n'%(currentFileName,currentFileName)
     for k,v in serverClomns.iteritems():
         if k==0:
@@ -181,11 +185,14 @@ def packDataList(dataList):
         for clomn, cell in row.iteritems():
             serverClomnsInfo = serverClomns.get(clomn)
             if serverClomnsInfo:
-                if('string' == serverClomnsInfo[0]):
-                    cell = cell.encode('utf-8','ignore')
-                    insertHead += '\'' + cell+'\', '
-                else:
-                    insertHead += str(long(cell)) +', '
+                try:
+                    if('string' == serverClomnsInfo[0]):
+                        cell = cell.encode('utf-8','ignore')
+                        insertHead += '\'' + cell+'\', '
+                    else:
+                        insertHead += str(long(cell)) +', '
+                except Exception, e:
+                    print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
             clientClomnsInfo = clientClomns.get(clomn)
             if clientClomnsInfo:
                 clientClomnsPack = clientClomnsInfo[1]
@@ -236,7 +243,7 @@ if __name__ == '__main__':
                 if fnmatch.fnmatch(name,pattern):
                     currentFileName= os.path.splitext(name)[0]
                     excelFile = os.path.join(root,name)
-                    print name
+                    print excelFile
                     parseExcel(excelFile)
                     break
     raw_input('input enter...>') 
