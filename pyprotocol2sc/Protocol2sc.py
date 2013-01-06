@@ -11,7 +11,7 @@ from lib.dir_utils import get_main_dir
 reload(sys)  
 sys.setdefaultencoding('utf-8') 
 
-from pyprotocol2sc.xmltool import *
+from lib.xmltool import *
 from  xml.dom import  minidom
 from pyprotocol2sc.protocol import Protocol, ProtocolRequest, ProtocolResponse,\
     ProtocolDataNull, ProtocolDataItemArray, ProtocolDataItemSingelField,\

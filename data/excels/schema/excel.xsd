@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 (http://www.altova.com) by hill (hill) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="record">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id"/>
+				<xs:element name="field1"/>
+				<xs:element name="field2"/>
+				<xs:element name="field3"/>
+				<xs:element name="field4"/>
+				<xs:element name="field5"/>
+				<xs:element name="field6"/>
+				<xs:element name="field7"/>
+				<xs:element name="field8"/>
+				<xs:element name="field9"/>
+				<xs:element name="field10"/>
+				<xs:element name="field11"/>
+				<xs:element name="field12"/>
+				<xs:element name="field13"/>
+				<xs:element name="field14"/>
+				<xs:element name="field15"/>
+				<xs:element name="field16"/>
+				<xs:element name="field17"/>
+				<xs:element name="field18"/>
+				<xs:element name="field19"/>
+				<xs:element name="field20"/>
+				<xs:element name="field21"/>
+				<xs:element name="field22"/>
+				<xs:element name="field23"/>
+				<xs:element name="field24"/>
+				<xs:element name="field25"/>
+				<xs:element name="field26"/>
+				<xs:element name="field27"/>
+				<xs:element name="field28"/>
+				<xs:element name="field29"/>
+				<xs:element name="field30"/>
+				<xs:element name="field31"/>
+				<xs:element name="field32"/>
+				<xs:element name="field33"/>
+				<xs:element name="field34"/>
+				<xs:element name="field35"/>
+				<xs:element name="field36"/>
+				<xs:element name="field37"/>
+				<xs:element name="field38"/>
+				<xs:element name="field39"/>
+				<xs:element name="field40"/>
+				<xs:element name="field41"/>
+				<xs:element name="field42"/>
+				<xs:element name="field43"/>
+				<xs:element name="field44"/>
+				<xs:element name="field45"/>
+				<xs:element name="field46"/>
+				<xs:element name="field47"/>
+				<xs:element name="field48"/>
+				<xs:element name="field49"/>
+				<xs:element name="field50"/>
+				<xs:element name="field51"/>
+				<xs:element name="field52"/>
+				<xs:element name="field53"/>
+				<xs:element name="field54"/>
+				<xs:element name="field55"/>
+				<xs:element name="field56"/>
+				<xs:element name="field57"/>
+				<xs:element name="field58"/>
+				<xs:element name="field59"/>
+				<xs:element name="field60"/>
+				<xs:element name="field61"/>
+				<xs:element name="field62"/>
+				<xs:element name="field63"/>
+				<xs:element name="field64"/>
+				<xs:element name="field65"/>
+				<xs:element name="field66"/>
+				<xs:element name="field67"/>
+				<xs:element name="field68"/>
+				<xs:element name="field69"/>
+				<xs:element name="field70"/>
+				<xs:element name="field71"/>
+				<xs:element name="field72"/>
+				<xs:element name="field73"/>
+				<xs:element name="field74"/>
+				<xs:element name="field75"/>
+				<xs:element name="field76"/>
+				<xs:element name="field77"/>
+				<xs:element name="field78"/>
+				<xs:element name="field79"/>
+				<xs:element name="field80"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="records">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="record"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

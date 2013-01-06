@@ -6,16 +6,17 @@ Created on 2012-12-8
 @author: Administrator
 '''
 import sys  
-from symbol import except_clause
 from lib.dir_utils import get_main_dir
 reload(sys)  
 sys.setdefaultencoding('utf-8') 
 
-from openpyxl import load_workbook
+from  xml.dom import  minidom
 from struct import pack, unpack
 from cStringIO import StringIO
-from pyexcel2sc.config import data_sql_dir,data_as_dir, data_dat_dir, excel_dir, isGenerateCreateSql, isGenerateAs,excel_filename
+from pyexcel2sc.config import data_sql_dir,data_as_dir, data_dat_dir, excel_dir, isGenerateCreateSql, isGenerateAs,excel_filename,\
+    xml_filename, xml_dir
 import os,fnmatch
+from lib.xmltool import get_nodes_by_name
 
 def intPack(value):
     return pack('i', int(value))
@@ -110,11 +111,10 @@ def processClomnNameComment(clomn, value):
     if clientClomns.has_key(clomn):
         clientClomns[clomn].append(value)
 
-def processRow(rowIndex, row, rowDict):
-    for clomn, cell in enumerate(row):
-            value = cell.internal_value
-            if cell.data_type == 'n':
-                value = long(value) if value else value
+def processRow(rowIndex, node, rowDict):
+    fields = node.childNodes
+    for clomn, cell in enumerate(fields):
+            value = cell.nodeValue
             if(rowIndex == 1):
                 if not value:
                     print '第一行存在空值'
@@ -145,6 +145,8 @@ def processRow(rowIndex, row, rowDict):
             rowDict[clomn] = value
 
 def generateCreateSql():
+    if not serverClomns:
+        return
     createSql = 'drop table if exists `m_%s`;\nCREATE TABLE `m_%s` (\n'%(currentFileName,currentFileName)
     for k,v in serverClomns.iteritems():
         if k==0:
@@ -169,9 +171,9 @@ def packDataList(dataList):
     serverStr = StringIO()
     clientStr = StringIO()
     asStr = StringIO()
-    if isGenerateCreateSql and serverClomns:
+    if isGenerateCreateSql:
         serverStr.write(generateCreateSql())
-    if isGenerateAs and clientClomns:
+    if isGenerateAs:
         asStr.write(generateAs())
         f = open(currentdir + data_as_dir + '/'+currentFileName+'.as', 'w')
         f.write(asStr.getvalue())
@@ -204,25 +206,24 @@ def packDataList(dataList):
                     print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
         insertHead = insertHead[0:len(insertHead)-2] + ');\n'
         serverStr.write(insertHead)
-    if isGenerateCreateSql and serverClomns:
-        f = open(currentdir + data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
-        f.write(serverStr.getvalue())
-        f.close()
-    if clientClomns:
-        f = open(currentdir + data_dat_dir + '/'+currentFileName+'.dat', 'wb')
-        f.write(clientStr.getvalue())
-        f.close()
+    f = open(currentdir + data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
+    f.write(serverStr.getvalue())
+    f.close()
+    f = open(currentdir + data_dat_dir + '/'+currentFileName+'.dat', 'wb')
+    f.write(clientStr.getvalue())
+    f.close()
 def parseExcel(excelFile):
     serverClomns.clear()
     clientClomns.clear()
-    wb = load_workbook(filename = excelFile, use_iterators = True)
-    ws = wb.get_sheet_by_name(name = wb.get_sheet_names()[0]) # ws is now an IterableWorksheet
     rowIndex = 0
     sheetRowList = []
-    for row in ws.iter_rows(): # it brings a new method: iter_rows()
+    doc = minidom.parse(excelFile) 
+    root = doc.documentElement
+    user_nodes = get_nodes_by_name(root,'record')
+    for node in user_nodes: 
         rowIndex += 1
         rowCellDict = {}
-        processRow(rowIndex, row,rowCellDict)
+        processRow(rowIndex, node,rowCellDict)
         if rowCellDict:
             sheetRowList.append(rowCellDict)
     
@@ -234,10 +235,10 @@ if __name__ == '__main__':
     currentdir = get_main_dir()+'/'
     print 'currentdir:', currentdir
     os.chdir(currentdir)
-    patterns = ['*.xls', '*.xlsx']
-    if excel_filename != '*':
-        patterns = excel_filename.split(',')
-    for root, dirs, files in os.walk(excel_dir, True):   
+    patterns = ['*.xml']
+    if xml_filename != '*':
+        patterns = xml_filename.split(',')
+    for root, dirs, files in os.walk(xml_dir, True):   
         for name in files:
             for pattern in patterns:
                 if fnmatch.fnmatch(name,pattern):
