@@ -213,20 +213,23 @@ def packDataList(dataList):
         f.write(clientStr.getvalue())
         f.close()
 def parseExcel(excelFile):
-    serverClomns.clear()
-    clientClomns.clear()
-    wb = load_workbook(filename = excelFile, use_iterators = True)
-    ws = wb.get_sheet_by_name(name = wb.get_sheet_names()[0]) # ws is now an IterableWorksheet
-    rowIndex = 0
-    sheetRowList = []
-    for row in ws.iter_rows(): # it brings a new method: iter_rows()
-        rowIndex += 1
-        rowCellDict = {}
-        processRow(rowIndex, row,rowCellDict)
-        if rowCellDict:
-            sheetRowList.append(rowCellDict)
-    
-    packDataList(sheetRowList)
+    try:
+        serverClomns.clear()
+        clientClomns.clear()
+        wb = load_workbook(filename = excelFile, use_iterators = True)
+        ws = wb.get_sheet_by_name(name = wb.get_sheet_names()[0]) # ws is now an IterableWorksheet
+        rowIndex = 0
+        sheetRowList = []
+        for row in ws.iter_rows(): # it brings a new method: iter_rows()
+            rowIndex += 1
+            rowCellDict = {}
+            processRow(rowIndex, row,rowCellDict)
+            if rowCellDict:
+                sheetRowList.append(rowCellDict)
+        
+        packDataList(sheetRowList)
+    except Exception,e:
+        print e
     
 if __name__ == '__main__':
     global currentdir
