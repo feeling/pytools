@@ -74,8 +74,8 @@ typeAsReadDict = {'int':'    //%s\n    var %s:int = bytes.readInt();\n',
             'ushort':'    //%s\n    var %s:uint = bytes.readUnsignedShort();\n',
             'byte':'    //%s\n    var %s:int = bytes.readByte();\n',
             'ubyte':'    //%s\n    var %s:uint = bytes.readUnsignedByte();\n',
-            'long':'    //%s\n    var %s:int = bytes.readInt();bytes.readInt();//as not surport long\n',
-            'ulong':'    //%s\n    var %s:uint = bytes.readUnsignedInt();bytes.readUnsignedInt();//as not surport long\n',
+            'long':'    //%s\n    var %s:Number = bytes.readDouble();\n',
+            'ulong':'    //%s\n    var %s:Number = bytes.readDouble();\n',
             'string':'    //%s\n    length = bytes.readUnsignedShort(); \n    if(length) {\n        var %s:String = bytes.readMultiByte(length,CharCode.UTF8);\n    }\n',
             }
 
@@ -234,19 +234,22 @@ def parseExcel(excelFile):
 if __name__ == '__main__':
     global currentdir
     global currentFileName
-    currentdir = get_main_dir()+'/'
-    print 'currentdir:', currentdir
-    os.chdir(currentdir)
-    patterns = ['*.xls', '*.xlsx']
-    if excel_filename != '*':
-        patterns = excel_filename.split(',')
-    for root, dirs, files in os.walk(excel_dir, True):   
-        for name in files:
-            for pattern in patterns:
-                if fnmatch.fnmatch(name,pattern):
-                    currentFileName= os.path.splitext(name)[0]
-                    excelFile = os.path.join(root,name)
-                    print excelFile
-                    parseExcel(excelFile)
-                    break
+    try:
+        currentdir = get_main_dir()+'/'
+        print 'currentdir:', currentdir
+        os.chdir(currentdir)
+        patterns = ['*.xls', '*.xlsx']
+        if excel_filename != '*':
+            patterns = excel_filename.split(',')
+        for root, dirs, files in os.walk(excel_dir, True):   
+            for name in files:
+                for pattern in patterns:
+                    if fnmatch.fnmatch(name,pattern):
+                        currentFileName= os.path.splitext(name)[0]
+                        excelFile = os.path.join(root,name)
+                        print excelFile
+                        parseExcel(excelFile)
+                        break
+    except Exception,e:
+        print e
     raw_input('input enter...>') 
