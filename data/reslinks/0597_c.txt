@@ -1,0 +1,10 @@
+GET http://wscdn.long2.9yuonline.com/ver32/resource/dynamicRes/role/player/132002/stand.9yur?16836 HTTP/1.1
+Accept: */*
+Accept-Language: zh-CN
+Referer: http://wscdn.long2.9yuonline.com/ver32/Main.swf?201303071236
+x-flash-version: 10,1,52,14
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0)
+Host: wscdn.long2.9yuonline.com
+Connection: Keep-Alive
+
