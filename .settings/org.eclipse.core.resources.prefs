@@ -1,4 +1,7 @@
 eclipse.preferences.version=1
+encoding//excel2sc/Excel2sc.py=utf-8
+encoding//excel2sc/Xml2sc.py=utf-8
+encoding//excel2sc/dataread.py=utf-8
 encoding//lib/dir_utils.py=utf-8
 encoding//lib/xmltool.py=utf-8
 encoding//out/GameServer/handler/guess_boss_handler.py=utf-8
@@ -10,8 +13,5 @@ encoding//out/GateWay/protocol/games/protocol_games_protocol.py=utf-8
 encoding//protocol2sc/Protocol2sc.py=utf-8
 encoding//protocol2sc/generate.py=utf-8
 encoding//protocol2sc/protocol.py=utf-8
-encoding//pyexcel2sc/Excel2sc.py=utf-8
-encoding//pyexcel2sc/Xml2sc.py=utf-8
-encoding//pyexcel2sc/dataread.py=utf-8
 encoding//resget/resgetMain.py=utf-8
 encoding/<project>=UTF-8
