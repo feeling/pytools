@@ -14,7 +14,7 @@ sys.setdefaultencoding('utf-8')
 from openpyxl import load_workbook
 from struct import pack, unpack
 from cStringIO import StringIO
-from pyexcel2sc.config import data_sql_dir,data_as_dir, data_dat_dir, excel_dir, isGenerateCreateSql, isGenerateAs,excel_filename
+from excel2sc.config import data_sql_dir,data_as_dir, data_dat_dir, excel_dir, isGenerateCreateSql, isGenerateAs,excel_filename
 import os,fnmatch
 
 def intPack(value):
@@ -79,6 +79,8 @@ typeAsReadDict = {'int':'    //%s\n    var %s:int = bytes.readInt();\n',
             'string':'    //%s\n    length = bytes.readUnsignedShort(); \n    if(length) {\n        var %s:String = bytes.readMultiByte(length,CharCode.UTF8);\n    }\n',
             }
 
+all_server_sql = []
+
 def processdomain(clomn, value):
     value = value.lower()
     if value == 'sc':
@@ -137,8 +139,12 @@ def processRow(rowIndex, row, rowDict):
             if not datatype:
                 datatype = clientClomns.get(clomn)
             if datatype and datatype[0]  == 'string':
-                if not value:
+#                print clomn, value
+#                if not value: 
+                if (not value) and (str(value) != '0.0') : # gai # 或许还会有问题,先用用看吧,不行了继续改
                     value = ''
+                if str(value) == '0.0':
+                    value = '0'
                 value = str(value) 
             elif datatype and datatype[0] and not value:
                 value = 0                
@@ -180,6 +186,7 @@ def packDataList(dataList):
     clientStr.write(pack('H', len(dataList)))
     for rowIndex, row in enumerate(dataList):
         insertHead = generateInsertHead()
+        row_data_list = []
         for clomn, cell in row.iteritems():
             serverClomnsInfo = serverClomns.get(clomn)
             if serverClomnsInfo:
@@ -187,27 +194,38 @@ def packDataList(dataList):
                     if('string' == serverClomnsInfo[0]):
                         cell = cell.encode('utf-8','ignore')
                         insertHead += '\'' + cell+'\', '
+                        row_data_list.append(cell)
                     else:
                         insertHead += str(long(cell)) +', '
+                        row_data_list.append(str(long(cell)))
                 except Exception, e:
                     print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
             clientClomnsInfo = clientClomns.get(clomn)
             if clientClomnsInfo:
                 clientClomnsPack = clientClomnsInfo[1]
                 try:
-                    if('string' == clientClomnsInfo[0] and clientClomnsPack):
-                        cell = cell.encode('utf-8','ignore')
-                        clientStr.write(clientClomnsPack(*cell))
+                    if 'string' == clientClomnsInfo[0] and clientClomnsPack:
+                        cell = cell.encode('utf-8', 'ignore')
+                        client_row = clientClomnsPack(*cell)
                     elif clientClomnsPack:
-                        clientStr.write(clientClomnsPack(cell))
+                        client_row = clientClomnsPack(cell)
                 except Exception, e:
                     print '%s行%s列 数据值为：%s，无法解析，错误信息：%s'%(rowIndex, clomn, cell, e)
         insertHead = insertHead[0:len(insertHead)-2] + ');\n'
-        serverStr.write(insertHead)
+        row_blank = True
+        for i in row_data_list:
+            if i and '0' != i:
+                row_blank = False
+        if not row_blank:
+            if serverClomnsInfo:
+                serverStr.write(insertHead)
+            if clientClomnsInfo:
+                clientStr.write(client_row)
     if isGenerateCreateSql and serverClomns:
         f = open(currentdir + data_sql_dir + '/m_'+currentFileName+'.sql', 'w')
         f.write(serverStr.getvalue())
         f.close()
+        all_server_sql.append(serverStr.getvalue())
     if clientClomns:
         f = open(currentdir + data_dat_dir + '/'+currentFileName+'.dat', 'wb')
         f.write(clientStr.getvalue())
@@ -251,5 +269,10 @@ if __name__ == '__main__':
                         parseExcel(excelFile)
                         break
     except Exception,e:
-        print e
+        print
+    if isGenerateCreateSql and serverClomns:
+        f = open(currentdir + data_sql_dir + '/m_'++'.sql', 'w')
+        for i in all_server_sql:
+            f.write(i)
+        f.close()
     raw_input('input enter...>') 
