@@ -25,6 +25,11 @@ def convertFieldName(name):
             class_name +=item
     return class_name
 
+class DataStruct():
+    def __init__(self):
+        self.data_dict = {}
+
+
 class Protocol():
     def __init__(self):
         self.request = None
@@ -93,7 +98,7 @@ class ProtocolDataItemArray():
             return self.class_name
         else :
             return self.name
-        
+
 class ProtocolDataItemList():
     def __init__(self):
         self.name = None

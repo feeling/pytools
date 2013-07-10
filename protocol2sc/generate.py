@@ -6,9 +6,9 @@ Created on 2012-12-19
 
 @author: hill
 '''
-from pyprotocol2sc.config import data_as_dir, data_python_dir
+from protocol2sc.config import data_as_dir, data_python_dir
 from cStringIO import StringIO
-from pyprotocol2sc.protocol import ProtocolDataItemArray,\
+from protocol2sc.protocol import ProtocolDataItemArray,\
     ProtocolDataItemList, ProtocolDataItemSingelField,\
     ProtocolDataItemComplexField, convertClassName, convertFieldName
     
@@ -122,7 +122,9 @@ def generatePythonMessage(protocols, currentdir, filename):
         if p.response and p.response.data_list:
             __generate_message_data_list(p.response.data_list, stream)
 
-    f = open(currentdir + data_python_dir + '/GateWay/'+filename+'_message.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/messages/gwm_' + filename + '.py', 'w')
+    f.write(python_file_code)
+    f.write('from lib.package import *\n\n\n')
     f.write(stream.getvalue())
     f.close()
 
@@ -148,7 +150,7 @@ def generatePythonProtocol(protocols, currentdir, filename):
     response_packages_client += '}\n\n'
     request_handlers_gateway +=  '}\n\n'
     request_handlers_game +=  '}\n\n'
-    f = open(currentdir + data_python_dir + '/GateWay/protocol/clients/'+filename+'_clients_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/protocol/clients/gwp_c_' + filename + '.py', 'w')
     f.write(python_file_code)
     f.write(python_client_file_header)
     f.write(request_packages_client)
@@ -157,21 +159,21 @@ def generatePythonProtocol(protocols, currentdir, filename):
     f.write(python_client_file_footer)
     f.close()
     
-    f = open(currentdir + data_python_dir + '/GateWay/protocol/games/'+filename+'_games_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GateWay/protocol/games/gwp_g_' + filename + '.py', 'w')
     f.write(python_file_code)
     f.write(python_game_file_header)
     f.write(request_handlers_game)
     f.write(python_game_file_footer)
     f.close()
     
-    f = open(currentdir + data_python_dir + '/GameServer/protocol/gateways/'+filename+'_gateways_protocol.py', 'w')
+    f = open(currentdir + data_python_dir + '/GameServer/protocol/gateways/gsp_gw_' + filename + '.py', 'w')
     f.write(python_file_code)
     f.write(python_gateway_file_header%filename)
     f.write(request_handlers_gateway)
     f.write(python_gateway_file_footer)
     f.close()
 
-    f = open(currentdir + data_python_dir + '/GameServer/handler/'+filename+'_handler.py', 'w')
+    f = open(currentdir + data_python_dir + '/GameServer/handler/gateways/gsh_gw_' + filename + '.py', 'w')
     f.write(python_file_code)
     f.write(request_handlers_define)
     f.close()
@@ -183,8 +185,8 @@ def __generate_message_data_list(data_list, stream):
             __generate_message_data_item_array(data,stream)
         elif isinstance(data, ProtocolDataItemList):
             __generate_message_data_item_list(data,stream)
-        elif isinstance(data, ProtocolDataItemSingelField):
-            __generate_message_data_item_single_field(data,stream)
+        #elif isinstance(data, ProtocolDataItemSingelField):
+            #__generate_message_data_item_single_field(data, stream)
         elif isinstance(data, ProtocolDataItemComplexField):
             __generate_message_data_item_complex_field(data,stream)
             
@@ -192,7 +194,10 @@ def __generate_message_data_item_array(item_array, stream):
     field = item_array.item_list[0]
     class_name  = convertClassName(item_array.get_class_name())
     if class_name not in message_class_dict:
-        message = 'class %s (Array):\n    #%s\n    field=\'%s\', \'%s\'\n\n'%(class_name, field.description, field.name, field.type)
+        if field.type == 'string':
+            message = 'class %s (List):\n    #%s\n    Field = %s\n\n\n' % (class_name, field.description, 'String')
+        else:
+            message = 'class %s (Array):\n    #%s\n    field = \'%s\', \'%s\'\n\n\n' % (class_name, field.description, field.name, field.type)
         stream.write(message)
         message_class_dict[class_name] = 1
     
@@ -201,12 +206,15 @@ def __generate_message_data_item_list(item_list, stream):
     __generate_message_data_item_complex_field(field,stream)
     class_name  = convertClassName(item_list.get_class_name())
     if class_name not in message_class_dict:
-        message = 'class %s (List):\n    #%s\n    Field=%s\n\n'%(class_name, field.description, convertClassName(field.name))
+        message = 'class %s (List):\n    #%s\n    Field = %s\n\n\n'%(class_name, field.description, convertClassName(field.get_class_name()))
         stream.write(message)
         message_class_dict[class_name] = 1
             
 def __generate_message_data_item_single_field(item_field, stream):
-    message = '(\'%s\',\'%s\')#%s\n'%( item_field.name, item_field.type, item_field.description)
+    if item_field.type == 'string':
+        message = '(\'%s\', %s)#%s\n' % (item_field.name, 'String', item_field.description)
+    else:
+        message = '(\'%s\', \'%s\')#%s\n' % (item_field.name, item_field.type, item_field.description)
     stream.write(message)
 
 def __generate_message_data_item_complex_field(item_field, stream):
@@ -214,15 +222,18 @@ def __generate_message_data_item_complex_field(item_field, stream):
     message = None
     class_name  = convertClassName(item_field.get_class_name())
     if class_name not in message_class_dict:
-        message = 'class %s (Field):\n    #%s\n    fields= (\n'%(class_name, item_field.description)
+        message = 'class %s (Field):\n    #%s\n    fields = (\n'%(class_name, item_field.description)
         for k, v in item_field.field_dict.iteritems():
-            if isinstance(v, ProtocolDataItemArray) or isinstance(v, ProtocolDataItemList) or isinstance(v, ProtocolDataItemComplexField) :
+            if isinstance(v, ProtocolDataItemArray) or isinstance(v, ProtocolDataItemList) or isinstance(v, ProtocolDataItemComplexField):
                 to_generate_list.append(v)
                 message += '        (\'%s\', %s),\n'%(k, convertClassName(v.get_class_name()))
             else:
-                message += '        (\'%s\', \'%s\'),\n'%(k, v.type)
-                
-        message += '    )\n\n'
+                if v.type == 'string':
+                    message += '        (\'%s\', %s),\n' % (k, 'String')
+                else:
+                    message += '        (\'%s\', \'%s\'),\n' % (k, v.type)
+
+        message += '    )\n\n\n'
         message_class_dict[class_name] = 1
         
     for data in to_generate_list:
@@ -294,8 +305,8 @@ def __generate_as_read_data_item_single_field(item_field, name='',tabs_num=0):
 def __generate_as_read_data_item_complex_field(item_field, name ='',tabs_num=0):
     rev = ''
     blank = '    '
-    blank *=tabs_num
-    rev += '\n    %s//TODO 读取类型为%s 对象%s,自己构造相关对象!!!\n'%(blank, convertClassName(item_field.name), convertFieldName(name))
+    blank *= tabs_num
+    rev += '\n    %s//TODO 读取类型为%s 对象%s,自己构造相关对象!!!\n' % (blank, convertClassName(item_field.get_class_name()), convertFieldName(name))
     
     for k, v in item_field.field_dict.iteritems():
         if isinstance(v, ProtocolDataItemArray):
@@ -312,13 +323,13 @@ def __generate_as_write_data_list(data_list, tabs_num=0):
     rev = ''
     for data in data_list:
         if isinstance(data, ProtocolDataItemArray):
-            rev +=__generate_as_write_data_item_array(data, '', tabs_num)
+            rev += __generate_as_write_data_item_array(data, '', tabs_num)
         elif isinstance(data, ProtocolDataItemList):
-            rev +=__generate_as_write_data_item_list(data, '', tabs_num)
+            rev += __generate_as_write_data_item_list(data, '', tabs_num)
         elif isinstance(data, ProtocolDataItemSingelField):
-            rev +=__generate_as_write_data_item_single_field(data, '', tabs_num)
+            rev += __generate_as_write_data_item_single_field(data, '', tabs_num)
         elif isinstance(data, ProtocolDataItemComplexField):
-            rev +=__generate_as_write_data_item_complex_field(data, '', tabs_num)
+            rev += __generate_as_write_data_item_complex_field(data, '', tabs_num)
     return rev
             
 def __generate_as_write_data_item_array(item_array, name='',tabs_num=0):
@@ -327,21 +338,21 @@ def __generate_as_write_data_item_array(item_array, name='',tabs_num=0):
         name = item_array.name
     name = convertFieldName(name)
     blank = '    '
-    blank *=tabs_num
+    blank *= tabs_num
     rev = '    %s//%s\n    %sfor(var %sIndex:int=0; %sIndex < %s.length; %sIndex++) {\n%s'\
             %(blank, item_array.description,blank, name, name, name, name, blank )
-    rev += __generate_as_write_data_item_single_field(field, '', tabs_num+1)
+    rev += __generate_as_write_data_item_single_field(field, '', tabs_num + 1)
     rev += '    %s}\n'%blank
     return rev
 
-def __generate_as_write_data_item_list(item_list, name='',tabs_num=0):
+def __generate_as_write_data_item_list(item_list, name='', tabs_num=0):
     rev = ''
     field = item_list.item_list[0]
     if not name:
         name = item_list.name
     name = convertFieldName(name)
     blank = '    '
-    blank *=tabs_num
+    blank *= tabs_num
     rev = '    %s//%s\n    %sfor(var %sIndex:int=0; %sIndex < %s.length; %sIndex++) {\n%s'\
             %(blank, item_list.description,blank, name, name, name, name, blank )
     rev += __generate_as_write_data_item_complex_field(field, '', tabs_num+1)
@@ -353,14 +364,14 @@ def __generate_as_write_data_item_single_field(item_field, name='',tabs_num=0):
         name = item_field.name
     name = convertFieldName(name)
     blank = '    '
-    blank *=tabs_num
+    blank *= tabs_num
     rev = as_write_dict.get(item_field.type)%(blank,item_field.description,blank, name)
     return rev
 
 def __generate_as_write_data_item_complex_field(item_field, name ='',tabs_num=0):
     rev = ''
     blank = '    '
-    blank *=tabs_num
+    blank *= tabs_num
     rev += '\n    %s//TODO 写入类型为%s 对象%s,自己构造相关对象提供数据写入，或者替换相关变量!!!\n'%(blank, convertClassName(item_field.name), convertFieldName(name))
     
     for k, v in item_field.field_dict.iteritems():

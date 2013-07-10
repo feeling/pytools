@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="schema/Protocol.xsd">
+	
+	<Protocol id="131001" name="demo" description="一个例子">
+		<Request type="C2G">
+			<DataGroup>
+				<ItemComplexField name="monster_info" description="怪物信息">
+					<ItemSingleField name="monster_pos" type="B" description=""/>
+				</ItemComplexField>
+			</DataGroup>
+		</Request>
+		<Response type="G2C">
+			<Result code="" reason="" msg=""/>
+			<Null />
+		</Response>
+	</Protocol>
+</Protocols>
+

@@ -13,12 +13,15 @@ sys.setdefaultencoding('utf-8')
 
 from lib.xmltool import *
 from  xml.dom import  minidom
-from pyprotocol2sc.protocol import Protocol, ProtocolRequest, ProtocolResponse,\
+from protocol2sc.protocol import Protocol, ProtocolRequest, ProtocolResponse,\
     ProtocolDataNull, ProtocolDataItemArray, ProtocolDataItemSingelField,\
-    ProtocolDataItemList, ProtocolDataItemComplexField, ProtocolDataResult
-from pyprotocol2sc.config import protocol_dir, protocol_filename
+    ProtocolDataItemList, ProtocolDataItemComplexField, ProtocolDataResult, DataStruct
+from protocol2sc.config import protocol_dir, protocol_filename
 import os,fnmatch
-from pyprotocol2sc.generate import generateCode
+from protocol2sc.generate import generateCode
+from copy import deepcopy
+
+data_struct = DataStruct()
 
 def parseProtocol(protocol_node, protocol):
     protocol.id = protocol_node.attributes['id'].value
@@ -64,8 +67,8 @@ def parseResult(node, response):
     result.msg = node.attributes['msg'].value
     response.result = result
 
-def parseDataGroup(dataGroupNode, data_contrainer):
-    data_list = data_contrainer.data_list
+def parseDataGroup(dataGroupNode, data_container):
+    data_list = data_container.data_list
     children = dataGroupNode.childNodes
     for node in children:
         if node.nodeName == 'ItemArray':
@@ -76,9 +79,50 @@ def parseDataGroup(dataGroupNode, data_contrainer):
             data_list.append(parseDataItemSingleField(node))
         elif node.nodeName == 'ItemComplexField':
             data_list.append(parseDataItemComplexField(node))
+        elif node.nodeName == 'ItemRef':
+            ref_item = parseItemRef(node)
+            if isinstance(ref_item, (ProtocolDataItemSingelField, ProtocolDataItemArray, ProtocolDataItemComplexField, ProtocolDataItemList)):
+                data_list.append(ref_item)
+            else:
+                print "[ERROR], item_ref:%s not in [ProtocolDataItemSingelField, ProtocolDataItemArray, ProtocolDataItemComplexField, ProtocolDataItemList]!" % ref_item.name
 
-def parseNull(node, data_contrainer):
-    data_contrainer.data_list.append(ProtocolDataNull())
+def parseDataStruct(dataStructNode, data_container):
+    data_dict = data_container.data_dict
+    children = dataStructNode.childNodes
+    for node in children:
+        if node.nodeName == 'ItemArray':
+            item_array = parseDataTtemArray(node)
+            item_array.class_name = item_array.name
+            data_dict[item_array.name] = item_array
+        elif node.nodeName == 'ItemList':
+            item_list = parseDataItemList(node)
+            item_list.class_name = item_list.name
+            data_dict[item_list.name] = item_list
+        elif node.nodeName == 'ItemSingleField':
+            item_single = parseDataItemSingleField(node)
+            item_single.class_name = item_single.name
+            data_dict[item_single.name] = item_single
+        elif node.nodeName == 'ItemComplexField':
+            item_complex = parseDataItemComplexField(node)
+            item_complex.class_name = item_complex.name
+            data_dict[item_complex.name] = item_complex
+
+
+def parseNull(node, data_container):
+    data_container.data_list.append(ProtocolDataNull())
+
+def parseItemRef(itemRefNode):
+    ref = itemRefNode.attributes['ref'].value
+    name = itemRefNode.attributes['name'].value
+    description = itemRefNode.attributes['description'].value
+    if ref in data_struct.data_dict:
+        ref_item = deepcopy(data_struct.data_dict[ref])
+        ref_item.name = name
+        ref_item.description = description
+        return ref_item
+    else:
+        print "[ERROR], item_ref:%s not exist!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % ref
+
 
 def parseDataTtemArray(itemArrayNode):
     children = itemArrayNode.childNodes
@@ -89,6 +133,12 @@ def parseDataTtemArray(itemArrayNode):
     for node in children:
         if node.nodeName == 'ItemSingleField':
             item_array.item_list.append(parseDataItemSingleField(node))
+        elif node.nodeName == 'ItemRef':
+            ref_item = parseItemRef(node)
+            if isinstance(ref_item, ProtocolDataItemSingelField):
+                item_array.item_list.append(ref_item)
+            else:
+                print "[ERROR], item_ref:%s not ProtocolDataItemSingelField!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % ref_item.name
     return item_array
 
 def parseDataItemSingleField(itemSingleFieldNode):
@@ -108,16 +158,22 @@ def parseDataItemComplexField(itemComplexFieldNode):
     for node in children:
         if node.nodeName == 'ItemArray':
             name = node.attributes['name'].value
-            field_dict[name]=parseDataTtemArray(node)
+            field_dict[name] = parseDataTtemArray(node)
         elif node.nodeName == 'ItemList':
             name = node.attributes['name'].value
-            field_dict[name]=parseDataItemList(node)
+            field_dict[name] = parseDataItemList(node)
         elif node.nodeName == 'ItemSingleField':
             name = node.attributes['name'].value
-            field_dict[name]=parseDataItemSingleField(node)
+            field_dict[name] = parseDataItemSingleField(node)
         elif node.nodeName == 'ItemComplexField':
             name = node.attributes['name'].value
-            field_dict[name]=parseDataItemComplexField(node)
+            field_dict[name] = parseDataItemComplexField(node)
+        elif node.nodeName == 'ItemRef':
+            ref_item = parseItemRef(node)
+            if isinstance(ref_item, (ProtocolDataItemSingelField, ProtocolDataItemArray, ProtocolDataItemComplexField, ProtocolDataItemList)):
+                field_dict[ref_item.name] = ref_item
+            else:
+                print "[ERROR], item_ref:%s not in [ProtocolDataItemSingelField, ProtocolDataItemArray, ProtocolDataItemComplexField, ProtocolDataItemList]!" % ref_item.name
     return item_complex_field
 
 def parseDataItemList(itemListNode):
@@ -129,21 +185,30 @@ def parseDataItemList(itemListNode):
     for node in children:
         if node.nodeName == 'ItemComplexField':
             item_list.item_list.append(parseDataItemComplexField(node))
+        elif node.nodeName == 'ItemRef':
+            ref_item = parseItemRef(node)
+            if isinstance(ref_item, ProtocolDataItemComplexField):
+                item_list.item_list.append(ref_item)
+            else:
+                print "[ERROR], item_ref:%s not ItemComplexField!!!!!!!!!!!!!!!!!!!!!!!!!!!!" % ref_item.name
     return item_list
 
 def parse_xml(xml_file, currentdir, currentFileName):
     doc = minidom.parse(xml_file) 
     root = doc.documentElement
-    protocol_nodes = get_nodes_by_name(root,'Protocol')
+    protocol_nodes = get_nodes_by_name(root, 'Protocol')
+    struct_nodes = get_nodes_by_name(root, 'DataStruct')
+    for struct_node in struct_nodes:
+        parseDataStruct(struct_node, data_struct)
     protocols = []
     for protocol_node in protocol_nodes:
         protocol = Protocol()
         protocols.append(protocol)
         parseProtocol(protocol_node, protocol)
-    generateCode(protocols, currentdir, currentFileName);
+    generateCode(protocols, currentdir, currentFileName)
 
 def main():
-    currentdir = get_main_dir()+'/'
+    currentdir = get_main_dir() + '/'
     print 'currentdir:', currentdir
     os.chdir(currentdir)
     patterns = ['*.xml']
